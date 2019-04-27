@@ -6,8 +6,6 @@
 package bank.GUI;
 
 import bank.account.BankAccount;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -32,14 +30,15 @@ import javafx.stage.Stage;
 public class BankAccountMain extends Application {
 
     private static Label bankNameLbl, routingNumberLbl, accoutNumberLbl, balanceLbl;
-    private static TextField bankName, routingNumber, accountNumber, balance;
-    private static Button btn, btnAddBankAccount, btnViewBankAccount;
+    private static TextField bankName, routingNumber, accountNumber, balance,deleteBankAccountById;
+    private static Button btn, btnAddBankAccount, btnViewBankAccount,deleteBankAccount,viewBankAccountBtn;
     private static GridPane grid;
     private static Scene addBankAccount, homeScene, bankAccountListing;
     private static VBox layout, bankAccountBox;
-    private static List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
+    private static HBox deleteBankAccountHBox;
+  //  private static List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
     private static TableView<BankAccount> bankAccountsTable;
-    private ObservableList<BankAccount> bankAccountObsList;
+    private static ObservableList<BankAccount> bankAccountObsList;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -73,7 +72,7 @@ public class BankAccountMain extends Application {
         routingNumber = new TextField();
         accountNumber = new TextField();
         balance = new TextField();
-
+        
         grid = new GridPane();
         grid.setVgap(4);
         grid.setHgap(10);
@@ -94,7 +93,28 @@ public class BankAccountMain extends Application {
         grid.add(balance, 1, 3);
         grid.add(balanceLbl, 0, 3);
         grid.add(btn, 1, 8);
-
+        
+        //delete bank account box
+        deleteBankAccountHBox = new HBox();
+        deleteBankAccountHBox.setPadding(new Insets(10,10,10,10));
+        deleteBankAccountHBox.setSpacing(10);
+        
+        //define field to input account number to delete
+        deleteBankAccountById = new TextField();
+        deleteBankAccountById.setPromptText("Accoumt Numbber");
+          
+      // delete account button
+      deleteBankAccount = new Button("Delete");
+      //view bank account button
+      viewBankAccountBtn = new Button("View Bank Account");
+      // delete bank account button
+      deleteBankAccount.setOnAction(e -> {
+          deleteButtonClicked();
+      });
+      
+      
+      deleteBankAccountHBox.getChildren().addAll(viewBankAccountBtn,deleteBankAccount);
+      
         Group root = (Group) addBankAccount.getRoot();
         root.getChildren().add(grid);
         window.setTitle("Enter Bank Information");
@@ -126,8 +146,8 @@ public class BankAccountMain extends Application {
         bankAccountsTable.getColumns().addAll(bankNameClm, routingNumberClm, accountNumberClm, balanceClm);
 
         bankAccountBox = new VBox();
-        //Add bank accounts table to the VBox
-        bankAccountBox.getChildren().addAll(bankAccountsTable);
+        //Add bank accounts   table to the VBox
+        bankAccountBox.getChildren().addAll(bankAccountsTable,deleteBankAccountHBox);
         //Bank Account Listing scene
         bankAccountListing = new Scene(bankAccountBox);
         bankAccountObsList = FXCollections.observableArrayList();
@@ -140,11 +160,11 @@ public class BankAccountMain extends Application {
             routingNumber.clear();
             accountNumber.clear();
             balance.clear();
-            bankAccounts.add(b);
+           // bankAccounts.add(b);
             window.setScene(homeScene);
         });
         
-        bankAccountsTable.setOnMouseClicked(e -> {
+        viewBankAccountBtn.setOnMouseClicked(e -> {
             System.out.println("Here");
            // System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getBankName());
             //System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getRoutingNumber());
@@ -158,7 +178,16 @@ public class BankAccountMain extends Application {
         launch(args);
     }
 
-    public ObservableList<BankAccount> getBankAccounts() {
+    
+    public static void deleteButtonClicked(){
+        //get list of items selected
+        ObservableList<BankAccount> bankAccountsSelected;
+        //get the bank accounts that are selected
+        bankAccountsSelected = bankAccountsTable.getSelectionModel().getSelectedItems();
+        //remove bank accounts from the list
+        bankAccountsSelected.forEach(bankAccountObsList::remove);
+    }
+    /*public ObservableList<BankAccount> getBankAccounts() {
         ObservableList<BankAccount> bankAccountsObsList = FXCollections.observableArrayList();
        // bankAccounts.add(new BankAccount("Chase", 12121, 54545, 100000));
        System.out.println("here");
@@ -167,5 +196,5 @@ public class BankAccountMain extends Application {
             bankAccountsObsList.add(b);
         }
         return bankAccountsObsList;
-    }
+    }*/
 }
