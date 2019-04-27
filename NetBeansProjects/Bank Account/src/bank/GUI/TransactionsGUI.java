@@ -10,9 +10,12 @@ import java.awt.Rectangle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -67,7 +70,23 @@ public class TransactionsGUI {
         bankTransactions.getColumns().addAll(transactionType, transactionAmount, accountNumberClm);
         VBox bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
-        bankAccountBox.getChildren().addAll(layout,bankTransactions);
+        
+        
+        HBox addTransactionEvent = new HBox();
+        TextField transactionTypeField,amountField,balanceField;
+        
+        transactionTypeField = new TextField();
+        transactionTypeField.setPromptText("Transaction Type");
+        amountField = new TextField();
+        amountField.setPromptText("Amount");
+        balanceField = new TextField();
+        balanceField.setPromptText("Balance");
+        Button btnAddTransaction = new Button("Add Transaction");
+        HBox addTransactionHBox = new HBox();
+        addTransactionHBox.getChildren().addAll(transactionTypeField,amountField,balanceField,btnAddTransaction);
+        
+        
+        bankAccountBox.getChildren().addAll(layout,bankTransactions,addTransactionHBox);
         Scene scene = new Scene(bankAccountBox);
         window.setScene(scene);
         window.showAndWait();
