@@ -6,7 +6,7 @@
 package bank.GUI;
 
 import bank.account.BankAccount;
-import java.awt.Rectangle;
+import bank.account.Transaction;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -43,36 +42,35 @@ public class TransactionsGUI {
         Label balance = new Label();
         balance.setText("Balance: " + Double.toString(bank.getBalance()));
 
-        HBox layout = new HBox(30);
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.setPadding(new Insets(15, 12, 15, 12));
-        layout.getChildren().addAll(bankName, routingNumber, accountNumber, balance);
+        HBox accountInfoHBox = new HBox(30);
+        accountInfoHBox.setAlignment(Pos.TOP_CENTER);
+        accountInfoHBox.setPadding(new Insets(15, 12, 15, 12));
+        accountInfoHBox.getChildren().addAll(bankName, routingNumber, accountNumber, balance);
         
-        TableView<BankAccount> bankTransactions;
+        TableView<Transaction> bankTransactions;
         bankTransactions = new TableView();
 
-        //Bank Name column
-        TableColumn<BankAccount, String> transactionType = new TableColumn<>("Transaction Type");
+        //Transaction type
+        TableColumn<Transaction, String> transactionType = new TableColumn<>("Transaction Type");
         transactionType.setMinWidth(200);
         transactionType.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
 
-        // Routing Number Column
-        TableColumn<BankAccount, Integer> transactionAmount = new TableColumn<>("Transaction Amount");
+        // Transaction Amount
+        TableColumn<Transaction, Double> transactionAmount = new TableColumn<>("Transaction Amount");
         transactionAmount.setMinWidth(200);
         transactionAmount.setCellValueFactory(new PropertyValueFactory<>("transactionAmount"));
 
         //Account Number Column
-        TableColumn<BankAccount, Integer> accountNumberClm = new TableColumn<>("Balance");
-        accountNumberClm.setMinWidth(200);
-        accountNumberClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        TableColumn<Transaction, Double> balanceClm = new TableColumn<>("Balance");
+        balanceClm.setMinWidth(200);
+        balanceClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         //add columns to table
-        bankTransactions.getColumns().addAll(transactionType, transactionAmount, accountNumberClm);
+        bankTransactions.getColumns().addAll(transactionType, transactionAmount,balanceClm);
+        bankTransactions.setItems(bank.getTransactions());
         VBox bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
         
-        
-        HBox addTransactionEvent = new HBox();
         TextField transactionTypeField,amountField,balanceField;
         
         transactionTypeField = new TextField();
@@ -82,11 +80,32 @@ public class TransactionsGUI {
         balanceField = new TextField();
         balanceField.setPromptText("Balance");
         Button btnAddTransaction = new Button("Add Transaction");
-        HBox addTransactionHBox = new HBox();
-        addTransactionHBox.getChildren().addAll(transactionTypeField,amountField,balanceField,btnAddTransaction);
+        Button deleteTransaction = new Button("Delete");
+        HBox addDeleteTransactionHBox = new HBox();
+        addDeleteTransactionHBox.getChildren().addAll(transactionTypeField,amountField,btnAddTransaction,deleteTransaction);
+        
+        btnAddTransaction.setOnAction(e -> {
+            //get the object selected
+            //Transaction t = bankTransactions.getSelectionModel().getSelectedItem();
+            //add a transaction to the bank account
+           // System.out.println(transactionTypeField.getText());
+           // System.out.println(Double.parseDouble(amountField.getText()));
+           Transaction t = new Transaction(transactionTypeField.getText(),Double.parseDouble(amountField.getText()),bank.getBalance());
+            bank.addTransaction(t);
+           //set the items on the table
+            bankTransactions.setItems(bank.getTransactions());
+            balance.setText("Balance: " + Double.toString(t.getBalance()));
+        });
+        
+        deleteTransaction.setOnAction(e -> {
+            System.out.println(transactionType.getTableView().getColumns().get(0));
+            System.out.println(transactionAmount.getTableView().getColumns().get(0));
+            System.out.println(balanceClm.getTableView().getColumns().get(0));
+        });
         
         
-        bankAccountBox.getChildren().addAll(layout,bankTransactions,addTransactionHBox);
+        
+        bankAccountBox.getChildren().addAll(accountInfoHBox,bankTransactions,addDeleteTransactionHBox);
         Scene scene = new Scene(bankAccountBox);
         window.setScene(scene);
         window.showAndWait();
