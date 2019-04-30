@@ -7,10 +7,12 @@ package bank.GUI;
 
 import bank.account.BankAccount;
 import bank.account.Transaction;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -28,6 +30,10 @@ import javafx.stage.Stage;
 public class TransactionsGUI {
 
     public static void getBankAccount(BankAccount bank) {
+           // Transaction types 
+        final String transactionTypeArray[] = 
+                   { "Withdraw", "Deposit" }; 
+
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Transactions");
@@ -71,10 +77,16 @@ public class TransactionsGUI {
         VBox bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
         
-        TextField transactionTypeField,amountField,balanceField;
+        TextField amountField,balanceField;
         
-        transactionTypeField = new TextField();
-        transactionTypeField.setPromptText("Transaction Type");
+       // transactionTypeField = new TextField();
+       // transactionTypeField.setPromptText("Transaction Type");     
+          
+        // Create a combo box for transaction types
+        ComboBox transactionTypeDropdown = 
+                     new ComboBox(FXCollections 
+                                 .observableArrayList(transactionTypeArray)); 
+        
         amountField = new TextField();
         amountField.setPromptText("Amount");
         balanceField = new TextField();
@@ -82,7 +94,7 @@ public class TransactionsGUI {
         Button btnAddTransaction = new Button("Add Transaction");
         Button deleteTransaction = new Button("Delete");
         HBox addDeleteTransactionHBox = new HBox();
-        addDeleteTransactionHBox.getChildren().addAll(transactionTypeField,amountField,btnAddTransaction,deleteTransaction);
+        addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown,amountField,btnAddTransaction,deleteTransaction);
         
         btnAddTransaction.setOnAction(e -> {
             //get the object selected
@@ -90,7 +102,8 @@ public class TransactionsGUI {
             //add a transaction to the bank account
            // System.out.println(transactionTypeField.getText());
            // System.out.println(Double.parseDouble(amountField.getText()));
-           Transaction t = new Transaction(transactionTypeField.getText(),Double.parseDouble(amountField.getText()),bank.getBalance());
+           System.out.println(transactionTypeDropdown.getValue().toString());
+           Transaction t = new Transaction(transactionTypeDropdown.getValue().toString(),Double.parseDouble(amountField.getText()),bank.getBalance());
             bank.addTransaction(t);
            //set the items on the table
             bankTransactions.setItems(bank.getTransactions());
