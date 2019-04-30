@@ -30,9 +30,9 @@ import javafx.stage.Stage;
 public class TransactionsGUI {
 
     public static void getBankAccount(BankAccount bank) {
-           // Transaction types 
-        final String transactionTypeArray[] = 
-                   { "Withdraw", "Deposit" }; 
+        // Transaction types 
+        final String transactionTypeArray[]
+                = {"Withdraw", "Deposit"};
 
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
@@ -52,13 +52,13 @@ public class TransactionsGUI {
         accountInfoHBox.setAlignment(Pos.TOP_CENTER);
         accountInfoHBox.setPadding(new Insets(15, 12, 15, 12));
         accountInfoHBox.getChildren().addAll(bankName, routingNumber, accountNumber, balance);
-        
+
         TableView<Transaction> bankTransactions;
         bankTransactions = new TableView();
-
+        bankTransactions.setItems(bank.getTransactions());
         //Transaction type
         TableColumn<Transaction, String> transactionType = new TableColumn<>("Transaction Type");
-        transactionType.setMinWidth(200);
+        transactionType.setMinWidth(400);
         transactionType.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
 
         // Transaction Amount
@@ -72,21 +72,20 @@ public class TransactionsGUI {
         balanceClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         //add columns to table
-        bankTransactions.getColumns().addAll(transactionType, transactionAmount,balanceClm);
-        bankTransactions.setItems(bank.getTransactions());
+        bankTransactions.getColumns().addAll(transactionType, transactionAmount, balanceClm);
+
         VBox bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
-        
-        TextField amountField,balanceField;
-        
-       // transactionTypeField = new TextField();
-       // transactionTypeField.setPromptText("Transaction Type");     
-          
+
+        TextField amountField, balanceField;
+
+        // transactionTypeField = new TextField();
+        // transactionTypeField.setPromptText("Transaction Type");     
         // Create a combo box for transaction types
-        ComboBox transactionTypeDropdown = 
-                     new ComboBox(FXCollections 
-                                 .observableArrayList(transactionTypeArray)); 
-        
+        ComboBox transactionTypeDropdown
+                = new ComboBox(FXCollections
+                        .observableArrayList(transactionTypeArray));
+
         amountField = new TextField();
         amountField.setPromptText("Amount");
         balanceField = new TextField();
@@ -94,31 +93,39 @@ public class TransactionsGUI {
         Button btnAddTransaction = new Button("Add Transaction");
         Button deleteTransaction = new Button("Delete");
         HBox addDeleteTransactionHBox = new HBox();
-        addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown,amountField,btnAddTransaction,deleteTransaction);
-        
+        addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown, amountField, btnAddTransaction, deleteTransaction);
+
         btnAddTransaction.setOnAction(e -> {
+
             //get the object selected
             //Transaction t = bankTransactions.getSelectionModel().getSelectedItem();
             //add a transaction to the bank account
-           // System.out.println(transactionTypeField.getText());
-           // System.out.println(Double.parseDouble(amountField.getText()));
-           System.out.println(transactionTypeDropdown.getValue().toString());
-           Transaction t = new Transaction(transactionTypeDropdown.getValue().toString(),Double.parseDouble(amountField.getText()),bank.getBalance());
+            // System.out.println(transactionTypeField.getText());
+            // System.out.println(Double.parseDouble(amountField.getText()));
+           // System.out.println(transactionTypeDropdown.getValue().toString());
+         //   System.out.println(bank.getBalance());
+            Transaction t = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), (bank.getBalance() - Double.parseDouble(amountField.getText())));
             bank.addTransaction(t);
-           //set the items on the table
-            bankTransactions.setItems(bank.getTransactions());
-            balance.setText("Balance: " + Double.toString(t.getBalance()));
+            //set the items on the table
+            //  bankTransactions.setItems(bank.getTransactions());
+            bank.setBalance(t.getTranscationType(), t.getTransactionAmount());
+            balance.setText("Balance: " + bank.getBalance());
+            //bankTransactions.setItems(bank.getTransactions());
+            e.consume();
         });
-        
+
         deleteTransaction.setOnAction(e -> {
-            System.out.println(transactionType.getTableView().getColumns().get(0));
-            System.out.println(transactionAmount.getTableView().getColumns().get(0));
-            System.out.println(balanceClm.getTableView().getColumns().get(0));
+            //get the bank accounts that are selected
+            Transaction t = bankTransactions.getSelectionModel().getSelectedItems().get(0);
+            bank.removeTransaction(t);
+            //remove bank accounts from the list
+            //transactionsSelected.forEach(bank.getTransactions()::remove);
+            balance.setText("Balance: " + bank.getBalance());
+
+            e.consume();
         });
-        
-        
-        
-        bankAccountBox.getChildren().addAll(accountInfoHBox,bankTransactions,addDeleteTransactionHBox);
+
+        bankAccountBox.getChildren().addAll(accountInfoHBox, bankTransactions, addDeleteTransactionHBox);
         Scene scene = new Scene(bankAccountBox);
         window.setScene(scene);
         window.showAndWait();
