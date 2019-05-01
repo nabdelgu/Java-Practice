@@ -165,7 +165,6 @@ public class BankAccountMain extends Application {
         });
         
         viewBankAccountBtn.setOnMouseClicked(e -> {
-            System.out.println("Here");
            // System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getBankName());
             //System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getRoutingNumber());
             //System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getAccountNo());
