@@ -5,7 +5,8 @@
  */
 package bank.account;
 
-import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -15,13 +16,14 @@ public class BankAccount extends Bank {
 
     private int accountNo;
     private double balance;
-    private ArrayList<Transaction> transactions;
+    //private ArrayList<Transaction> transactions;
+    private ObservableList<Transaction> transactions;
 
-    public BankAccount(String bankName, int routingNumber, int accountNo, double balance) {
+    public BankAccount(String bankName, int routingNumber, int accountNo, double balance) throws NumberFormatException {
         super(bankName, routingNumber);
         this.accountNo = accountNo;
         this.balance = balance;
-        transactions = new ArrayList<Transaction>();
+        transactions = FXCollections.observableArrayList();
     }
 
     public int getAccountNo() {
@@ -36,20 +38,35 @@ public class BankAccount extends Bank {
         return balance;
     }
 
-    public void setBalance(int Balance) {
-        this.balance = balance;
-    }
-
-    public void getTransactions() {
-        for (Transaction t : transactions) {
-            System.out.println(t);
+    public void setBalance(String transactionType,double transactionAmount) {
+        if (transactionType.equals(TransactionType.Withdraw.getDescription())) {
+            this.balance = balance - transactionAmount;
+        } else if (transactionType.equals(TransactionType.Deposit.getDescription())) {
+            this.balance = balance + transactionAmount;
         }
     }
 
-    public void setTransactions(ArrayList<Transaction> transactions) {
+    public ObservableList getTransactions() {
+        /*for (Transaction t : transactions) {
+            System.out.println(t);
+        }*/
+        return transactions;
+    }
+    
+    public void removeTransaction(Transaction t){
+        if(t.getTransactionType().equals(TransactionType.Withdraw.getDescription())){
+            this.balance = this.balance + t.getTransactionAmount();
+        }else if(t.getTransactionType().equals(TransactionType.Deposit.getDescription())){
+            this.balance = this.balance - t.getTransactionAmount();
+        }
+        transactions.remove(t);
+        
+    }
+    
+
+     public void setTransactions(ObservableList<Transaction> transactions) {
         this.transactions = transactions;
     }
-
     public void addTransaction(Transaction t) {
         transactions.add(t);
     }
