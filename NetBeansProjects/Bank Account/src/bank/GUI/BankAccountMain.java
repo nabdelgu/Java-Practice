@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bank.GUI;
 
 import bank.account.BankAccount;
@@ -30,60 +25,64 @@ import javafx.stage.Stage;
 public class BankAccountMain extends Application {
 
     private static Label bankNameLbl, routingNumberLbl, accoutNumberLbl, balanceLbl;
-    private static TextField bankName, routingNumber, accountNumber, balance,deleteBankAccountById;
-    private static Button btn, btnAddBankAccount, btnViewBankAccount,deleteBankAccount,viewBankAccountBtn;
+    private static TextField bankName, routingNumber, accountNumber, balance, deleteBankAccountById;
+    private static Button enterBankAccount, btnAddBankAccount, btnViewBankAccount, deleteBankAccount, viewBankAccountBtn;
     private static GridPane grid;
     private static Scene addBankAccount, homeScene, bankAccountListing;
-    private static VBox layout, bankAccountBox;
+    private static VBox homePageBox, bankAccountBox;
     private static HBox deleteBankAccountHBox;
-  //  private static List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
+    private static Stage homeWindow, bankAccountsStage;
     private static TableView<BankAccount> bankAccountsTable;
     private static ObservableList<BankAccount> bankAccountObsList;
+    private static BankAccount bankAccount;
+    private static Group root;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Stage window = primaryStage;
-        Stage bankAccountsStage = new Stage();
+        // bank account home page
+        homeWindow = primaryStage;
+        bankAccountsStage = new Stage();
         bankAccountsStage.setTitle("Bank Account List");
         btnAddBankAccount = new Button("Add Bank Account");
         btnViewBankAccount = new Button("View Bank Accounts");
-        layout = new VBox();
-        layout.setSpacing(50);
-        layout.getChildren().addAll(btnAddBankAccount, btnViewBankAccount);
-        homeScene = new Scene(layout, 300, 250);
-        window.setTitle("Bank Home");
-        window.setScene(homeScene);
-        window.show();
-
+        homePageBox = new VBox();
+        homePageBox.setSpacing(50);
+        homePageBox.getChildren().addAll(btnAddBankAccount, btnViewBankAccount);
+        homeScene = new Scene(homePageBox, 300, 250);
+        homeWindow.setTitle("Bank Home");
+        homeWindow.setScene(homeScene);
+        homeWindow.show();
+        //add bank account button
         btnAddBankAccount.setOnAction(e -> {
-            window.setScene(addBankAccount);
-            window.show();
+            homeWindow.setScene(addBankAccount);
+            homeWindow.show();
         });
-
+        //view bank acccount button
         btnViewBankAccount.setOnAction(e -> {
             bankAccountsStage.setScene(bankAccountListing);
             bankAccountsTable.setItems(bankAccountObsList);
             bankAccountsStage.show();
         });
-
+        // add bank account scene
         addBankAccount = new Scene(new Group(), 450, 250);
 
         bankName = new TextField();
         routingNumber = new TextField();
         accountNumber = new TextField();
         balance = new TextField();
-        
+
         grid = new GridPane();
         grid.setVgap(4);
         grid.setHgap(10);
         grid.setPadding(new Insets(5, 5, 5, 5));
+        // define labels
         bankNameLbl = new Label("Bank Name");
         routingNumberLbl = new Label("Routing Number");
         accoutNumberLbl = new Label("Account Number");
         balanceLbl = new Label("Balance");
 
-        btn = new Button("Enter");
-
+        enterBankAccount = new Button("Enter");
+        // add items to the grid
         grid.add(bankNameLbl, 0, 0);
         grid.add(bankName, 1, 0);
         grid.add(routingNumber, 1, 1);
@@ -92,32 +91,31 @@ public class BankAccountMain extends Application {
         grid.add(accoutNumberLbl, 0, 2);
         grid.add(balance, 1, 3);
         grid.add(balanceLbl, 0, 3);
-        grid.add(btn, 1, 8);
-        
+        grid.add(enterBankAccount, 1, 8);
+
         //delete bank account box
         deleteBankAccountHBox = new HBox();
-        deleteBankAccountHBox.setPadding(new Insets(10,10,10,10));
+        deleteBankAccountHBox.setPadding(new Insets(10, 10, 10, 10));
         deleteBankAccountHBox.setSpacing(10);
-        
+
         //define field to input account number to delete
         deleteBankAccountById = new TextField();
         deleteBankAccountById.setPromptText("Accoumt Numbber");
-          
-      // delete account button
-      deleteBankAccount = new Button("Delete");
-      //view bank account button
-      viewBankAccountBtn = new Button("View Bank Account");
-      // delete bank account button
-      deleteBankAccount.setOnAction(e -> {
-          deleteButtonClicked();
-      });
-      
-      
-      deleteBankAccountHBox.getChildren().addAll(viewBankAccountBtn,deleteBankAccount);
-      
-        Group root = (Group) addBankAccount.getRoot();
+
+        // delete account button
+        deleteBankAccount = new Button("Delete");
+        //view bank account button
+        viewBankAccountBtn = new Button("View Bank Account");
+        // delete bank account button
+        deleteBankAccount.setOnAction(e -> {
+            deleteButtonClicked();
+        });
+
+        deleteBankAccountHBox.getChildren().addAll(viewBankAccountBtn, deleteBankAccount);
+
+        root = (Group) addBankAccount.getRoot();
         root.getChildren().add(grid);
-        window.setTitle("Enter Bank Information");
+        homeWindow.setTitle("Enter Bank Information");
 
         //Bank Name column
         TableColumn<BankAccount, String> bankNameClm = new TableColumn<>("Bank Name");
@@ -147,28 +145,24 @@ public class BankAccountMain extends Application {
 
         bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
-        bankAccountBox.getChildren().addAll(bankAccountsTable,deleteBankAccountHBox);
+        bankAccountBox.getChildren().addAll(bankAccountsTable, deleteBankAccountHBox);
         //Bank Account Listing scene
         bankAccountListing = new Scene(bankAccountBox);
         bankAccountObsList = FXCollections.observableArrayList();
 
         // enter bank account information
-        btn.setOnAction(e -> {
-            BankAccount b = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()));
-            bankAccountObsList.add(b);
+        enterBankAccount.setOnAction(e -> {
+            bankAccount = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()));
+            bankAccountObsList.add(bankAccount);
             bankName.clear();
             routingNumber.clear();
             accountNumber.clear();
             balance.clear();
-           // bankAccounts.add(b);
-            window.setScene(homeScene);
+            // bankAccounts.add(b);
+            homeWindow.setScene(homeScene);
         });
-        
+        // view bank account invoke TransactionGUI class method
         viewBankAccountBtn.setOnMouseClicked(e -> {
-           // System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getBankName());
-            //System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getRoutingNumber());
-            //System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getAccountNo());
-           // System.out.println(bankAccountsTable.getSelectionModel().getSelectedItem().getBalance());
             TransactionsGUI.getBankAccount(bankAccountsTable.getSelectionModel().getSelectedItem());
         });
     }
@@ -177,8 +171,8 @@ public class BankAccountMain extends Application {
         launch(args);
     }
 
-    
-    public static void deleteButtonClicked(){
+    //button to delete bank account
+    public static void deleteButtonClicked() {
         //get list of items selected
         ObservableList<BankAccount> bankAccountsSelected;
         //get the bank accounts that are selected
@@ -186,14 +180,5 @@ public class BankAccountMain extends Application {
         //remove bank accounts from the list
         bankAccountsSelected.forEach(bankAccountObsList::remove);
     }
-    /*public ObservableList<BankAccount> getBankAccounts() {
-        ObservableList<BankAccount> bankAccountsObsList = FXCollections.observableArrayList();
-       // bankAccounts.add(new BankAccount("Chase", 12121, 54545, 100000));
-       System.out.println("here");
-        for (BankAccount b : bankAccounts) {
-            System.out.println(b);
-            bankAccountsObsList.add(b);
-        }
-        return bankAccountsObsList;
-    }*/
+
 }
