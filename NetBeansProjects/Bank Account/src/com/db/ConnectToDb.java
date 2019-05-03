@@ -4,21 +4,35 @@
  * and open the template in the editor.
  */
 package com.db;
+
 import java.sql.*;
+
 /**
  *
  * @author Noah
  */
 public class ConnectToDb {
-    public static void main(String [] args){
+
+    public static void main(String[] args) {
         Connection c = null;
-        try{
+        try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:BankDatabse.db");
+            c = DriverManager.getConnection("jdbc:sqlite:BankDatabase.db");
             System.out.println("Connect successfully");
-        }catch(Exception ex){
-            System.out.println("Connection failed");
+            String SQLAdd;
+            SQLAdd = "insert into"
+                    + " BankAccounts(BankName,RoutingNumber,AccountNumber,Balance) "
+                    + "values('TestBank','546565','234324','1523')";
+            Statement stmt = c.createStatement();
+
+            stmt.executeUpdate(SQLAdd);
+        } catch (SQLException ex) {
+            System.out.println("SQL Exception");
+            System.exit(0);
+        } catch (ClassNotFoundException ex) {
+            System.out.println("Class not found exception");
             System.exit(0);
         }
+
     }
 }
