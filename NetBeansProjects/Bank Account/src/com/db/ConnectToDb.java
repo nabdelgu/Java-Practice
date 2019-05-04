@@ -25,7 +25,7 @@ public class ConnectToDb {
                     + "values('TestBank','546565','234324','1523')";
             Statement stmt = c.createStatement();
 
-            stmt.executeUpdate(SQLAdd);
+            //stmt.executeUpdate(SQLAdd);
         } catch (SQLException ex) {
             System.out.println("SQL Exception");
             System.exit(0);
