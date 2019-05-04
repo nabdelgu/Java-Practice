@@ -5,10 +5,27 @@
  */
 package bank.account;
 
+
 /**
  *
  * @author noaha
  */
 public enum TransactionType {
-    Withdraw,Deposit
+    Withdraw("Withdraw"),Deposit("Deposit");
+
+    private TransactionType(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+     
+    public static String[] getArrayTransaction(){
+        final String transactionTypes[] = {Withdraw.getDescription(), Deposit.getDescription()};
+        return transactionTypes;
+    }
+    private final String description;
+    
+    
 }
