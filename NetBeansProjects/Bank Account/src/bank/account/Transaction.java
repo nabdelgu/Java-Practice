@@ -11,10 +11,6 @@ package bank.account;
  */
 public class Transaction {
     private String transactionType;
-
-    public String getTransactionType() {
-        return transactionType;
-    }
     private double transactionAmount;
     private double balance;
 
@@ -28,6 +24,10 @@ public class Transaction {
         if (transactionType.equals("Deposit")) {
             this.balance = balance + transactionAmount;
         }
+    }
+    
+    public String getTransactionType() {
+        return transactionType;
     }
 
     public double getTransactionAmount() {

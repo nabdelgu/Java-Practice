@@ -13,17 +13,22 @@ import java.sql.*;
  */
 public class ConnectToDb {
 
+    private static Connection connection = null;
+    private static final String DATABASE_DRIVER = "org.sqlite.JDBC";
+    private static final String DATABASE_NAME = "jdbc:sqlite:BankDatabase.db";
+
     public static void main(String[] args) {
-        Connection c = null;
+
         try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:BankDatabase.db");
-            System.out.println("Connect successfully");
-            String SQLAdd;
+
+            connection = ConnectToDb.getConnection();
+            connection.close();
+            System.out.println("Connection sucessful");
+            /*String SQLAdd;
             SQLAdd = "insert into"
                     + " BankAccounts(BankName,RoutingNumber,AccountNumber,Balance) "
                     + "values('TestBank','546565','234324','1523')";
-            Statement stmt = c.createStatement();
+            Statement stmt = connection.createStatement();*/
 
             //stmt.executeUpdate(SQLAdd);
         } catch (SQLException ex) {
@@ -35,4 +40,12 @@ public class ConnectToDb {
         }
 
     }
+
+    public static Connection getConnection() throws SQLException, ClassNotFoundException {
+        Class.forName(DATABASE_DRIVER);
+        connection = DriverManager.getConnection(DATABASE_NAME);
+
+        return connection;
+    }
+
 }
