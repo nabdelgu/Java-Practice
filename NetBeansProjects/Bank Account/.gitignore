@@ -10,6 +10,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-BankDatabase.db
+*.db
 
 # End of https://www.gitignore.io/api/netbeans
