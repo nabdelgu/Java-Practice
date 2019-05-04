@@ -27,6 +27,7 @@ public class BankGUI {
     private static GridPane grid;
     private static Scene scene;
     private static BankAccount b1;
+    private static Group root;
 
     public static BankAccount getBankInformation() {
         Stage window = new Stage();
@@ -58,7 +59,7 @@ public class BankGUI {
         grid.add(balanceLbl, 0, 3);
         grid.add(btn, 1, 8);
 
-        Group root = (Group) scene.getRoot();
+        root = (Group) scene.getRoot();
         root.getChildren().add(grid);
         window.setScene(scene);
         window.setTitle("Enter Bank Information");

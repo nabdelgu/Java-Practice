@@ -7,10 +7,12 @@ package bank.GUI;
 
 import bank.account.BankAccount;
 import bank.account.Transaction;
+import bank.account.TransactionType;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -40,9 +42,8 @@ public class TransactionsGUI {
     private static ComboBox transactionTypeDropdown;
     private static Button btnAddTransaction, deleteTransaction;
     private static Transaction transaction;
-    private static final String transactionTyps[] = {"Withdraw", "Deposit"};
 
-    public static void getBankAccount(BankAccount bank) {
+    public static void getBankAccount(BankAccount bank) throws NumberFormatException,NullPointerException {
         window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Transactions");
@@ -57,12 +58,12 @@ public class TransactionsGUI {
         accountNumber.setText("Account Number: " + Integer.toString(bank.getAccountNo()));
         balance = new Label();
         balance.setText("Balance: " + Double.toString(bank.getBalance()));
-        
+
         accountInfoHBox = new HBox(30);
         accountInfoHBox.setAlignment(Pos.TOP_CENTER);
         accountInfoHBox.setPadding(new Insets(15, 12, 15, 12));
         accountInfoHBox.getChildren().addAll(bankName, routingNumber, accountNumber, balance);
-        
+
         bankTransactions = new TableView();
         bankTransactions.setItems(bank.getTransactions());
         // define table columns
@@ -83,11 +84,11 @@ public class TransactionsGUI {
 
         //add columns to table
         bankTransactions.getColumns().addAll(transactionType, transactionAmount, balanceClm);
-        
+
         bankAccountBox = new VBox();
         //Add bank accounts table to the VBox
-        transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(transactionTyps));
-        
+        transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(TransactionType.getArrayTransaction()));
+
         amountField = new TextField();
         amountField.setPromptText("Amount");
         balanceField = new TextField();
@@ -98,26 +99,36 @@ public class TransactionsGUI {
         addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown, amountField, btnAddTransaction, deleteTransaction);
         // add transaction button
         btnAddTransaction.setOnAction(e -> {
+
             try {
-                transaction = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), (bank.getBalance() - Double.parseDouble(amountField.getText())));                
-            } catch (NumberFormatException numberFormatException) {
-                AlertError.displayErrorAlert("String found where a number is required");
+                transaction = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), (bank.getBalance() - Double.parseDouble(amountField.getText())));
+                bank.addTransaction(transaction);
+                //set the items on the table
+                bank.setBalance(transaction.getTransactionType(), transaction.getTransactionAmount());
+                balance.setText("Balance: " + bank.getBalance());
+            } catch (NumberFormatException ex) {
+                if (transactionTypeDropdown.getValue().toString().equals("") || amountField.getText().equals("")) {
+                    AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
+                } else {
+                    AlertError.displayError("Error", "Text entered where a number was expected", Alert.AlertType.ERROR);
+                }
+
+            }catch(NullPointerException ex){
+                 AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
             }
-            
-            bank.addTransaction(transaction);
-            //set the items on the table
-            bank.setBalance(transaction.getTransactionType(), transaction.getTransactionAmount());
-            balance.setText("Balance: " + bank.getBalance());
-            e.consume();
+
         });
         //delete transaction button
         deleteTransaction.setOnAction(e -> {
-            //get the bank accounts that are selected
+            try{
+                            //get the bank accounts that are selected
             transaction = bankTransactions.getSelectionModel().getSelectedItems().get(0);
             bank.removeTransaction(transaction);
             //remove bank accounts from the list
             balance.setText("Balance: " + bank.getBalance());
-            e.consume();
+            }catch(NullPointerException ex){
+                // catch null pointer if nothing is selected
+            }
         });
         // add all item to a VBOX
         bankAccountBox.getChildren().addAll(accountInfoHBox, bankTransactions, addDeleteTransactionHBox);

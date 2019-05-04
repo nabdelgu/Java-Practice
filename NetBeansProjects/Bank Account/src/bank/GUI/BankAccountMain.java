@@ -5,8 +5,10 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -38,7 +40,7 @@ public class BankAccountMain extends Application {
     private static Group root;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws NumberFormatException,NullPointerException {
         // bank account home page
         homeWindow = primaryStage;
         bankAccountsStage = new Stage();
@@ -46,6 +48,7 @@ public class BankAccountMain extends Application {
         btnAddBankAccount = new Button("Add Bank Account");
         btnViewBankAccount = new Button("View Bank Accounts");
         homePageBox = new VBox();
+        homePageBox.setAlignment(Pos.CENTER);
         homePageBox.setSpacing(50);
         homePageBox.getChildren().addAll(btnAddBankAccount, btnViewBankAccount);
         homeScene = new Scene(homePageBox, 300, 250);
@@ -152,23 +155,38 @@ public class BankAccountMain extends Application {
 
         // enter bank account information
         enterBankAccount.setOnAction(e -> {
-            bankAccount = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()));
-            bankAccountObsList.add(bankAccount);
-            bankName.clear();
-            routingNumber.clear();
-            accountNumber.clear();
-            balance.clear();
-            // bankAccounts.add(b);
-            homeWindow.setScene(homeScene);
+            try {
+                bankAccount = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()));
+                bankAccountObsList.add(bankAccount);
+                bankName.clear();
+                routingNumber.clear();
+                accountNumber.clear();
+                balance.clear();
+                // bankAccounts.add(b);
+                homeWindow.setScene(homeScene);
+            } catch (NumberFormatException ex) {
+                if (bankName.getText().equals("") || routingNumber.getText().equals(null) || accountNumber.getText().equals("") || balance.getText().equals(null)) {
+                    AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
+                } else {
+                    AlertError.displayError("Error", "Text entered where a number was expected", Alert.AlertType.ERROR);
+                }
+            }
+
         });
         // view bank account invoke TransactionGUI class method
         viewBankAccountBtn.setOnMouseClicked(e -> {
-            TransactionsGUI.getBankAccount(bankAccountsTable.getSelectionModel().getSelectedItem());
+            try{
+                 TransactionsGUI.getBankAccount(bankAccountsTable.getSelectionModel().getSelectedItem());
+            }catch(NullPointerException ex){
+                //nothing selected
+            }
+           
         });
     }
 
     public static void main(String[] args) {
         launch(args);
+
     }
 
     //button to delete bank account

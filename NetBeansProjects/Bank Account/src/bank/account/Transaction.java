@@ -11,6 +11,10 @@ package bank.account;
  */
 public class Transaction {
     private String transactionType;
+
+    public String getTransactionType() {
+        return transactionType;
+    }
     private double transactionAmount;
     private double balance;
 
