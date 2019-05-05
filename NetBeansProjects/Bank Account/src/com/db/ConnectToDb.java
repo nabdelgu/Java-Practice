@@ -23,14 +23,13 @@ public class ConnectToDb {
 
             connection = ConnectToDb.getConnection();
             connection.close();
-            System.out.println("Connection sucessful");
-            /*String SQLAdd;
+            System.out.println("Connection sucessful");         
+           /* String SQLAdd;
             SQLAdd = "insert into"
                     + " BankAccounts(BankName,RoutingNumber,AccountNumber,Balance) "
                     + "values('TestBank','546565','234324','1523')";
-            Statement stmt = connection.createStatement();*/
-
-            //stmt.executeUpdate(SQLAdd);
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate(SQLAdd);*/
         } catch (SQLException ex) {
             System.out.println("SQL Exception");
             System.exit(0);

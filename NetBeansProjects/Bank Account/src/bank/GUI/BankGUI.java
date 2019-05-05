@@ -20,7 +20,7 @@ import javafx.stage.Stage;
  * @author Noah
  */
 public class BankGUI {
-
+    /*
     private static Label bankNameLbl, routingNumberLbl, accoutNumberLbl, balanceLbl;
     private static TextField bankName, routingNumber, accountNumber, balance;
     private static Button btn;
@@ -73,4 +73,5 @@ public class BankGUI {
 
         return b1;
     }
+     */
 }

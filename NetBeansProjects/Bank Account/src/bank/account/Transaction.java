@@ -10,13 +10,15 @@ package bank.account;
  * @author noaha
  */
 public class Transaction {
+    private int transactionID;
     private String transactionType;
     private double transactionAmount;
     private double balance;
 
-    public Transaction(String transactionType, double transactionAmount,double balance) {
+    public Transaction(String transactionType, double transactionAmount,double balance,int transactionID) {
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
+        this.transactionID = transactionID;
         if (transactionType.equals("Withdraw")) {
             this.balance = balance - transactionAmount;
         }
@@ -24,6 +26,14 @@ public class Transaction {
         if (transactionType.equals("Deposit")) {
             this.balance = balance + transactionAmount;
         }
+    }
+
+    public int getTransactionID() {
+        return transactionID;
+    }
+
+    public void setTransactionID(int transactionID) {
+        this.transactionID = transactionID;
     }
     
     public String getTransactionType() {

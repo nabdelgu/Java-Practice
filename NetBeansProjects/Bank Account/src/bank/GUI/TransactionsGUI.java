@@ -122,8 +122,7 @@ public class TransactionsGUI {
         deleteTransaction.setOnAction(e -> {
             try{
                             //get the bank accounts that are selected
-            transaction = bankTransactions.getSelectionModel().getSelectedItems().get(0);
-            bank.removeTransaction(transaction);
+            bank.removeTransaction(bankTransactions.getSelectionModel().getSelectedItems().get(0));
             //remove bank accounts from the list
             balance.setText("Balance: " + bank.getBalance());
             }catch(NullPointerException ex){
