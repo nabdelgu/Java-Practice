@@ -8,6 +8,10 @@ package bank.GUI;
 import bank.account.BankAccount;
 import bank.account.Transaction;
 import bank.account.TransactionType;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,7 +35,7 @@ import javafx.stage.Stage;
  */
 public class TransactionsGUI {
 
-    private static Stage window;
+    private static Stage bankTransctionStage;
     private static Scene transactionScene;
     private static Label bankName, routingNumber, accountNumber, balance;
     private static HBox accountInfoHBox, addDeleteTransactionHBox;
@@ -43,11 +47,12 @@ public class TransactionsGUI {
     private static Button btnAddTransaction, deleteTransaction;
     private static Transaction transaction;
 
-    public static void getBankAccount(BankAccount bank) throws NumberFormatException,NullPointerException {
-        window = new Stage();
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Transactions");
-        window.setMinWidth(250);
+    public static void getBankAccount(BankAccount bank,Connection connectionToDB) throws NumberFormatException, NullPointerException {
+        bankTransctionStage = new Stage();
+        
+        bankTransctionStage.initModality(Modality.APPLICATION_MODAL);
+        bankTransctionStage.setTitle("Transactions");
+        bankTransctionStage.setMinWidth(250);
 
         // fill in bank information
         bankName = new Label();
@@ -101,10 +106,12 @@ public class TransactionsGUI {
         btnAddTransaction.setOnAction(e -> {
 
             try {
-                transaction = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), (bank.getBalance() - Double.parseDouble(amountField.getText())));
-                bank.addTransaction(transaction);
+                 bank.setBalance(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()),connectionToDB);
+                transaction = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), bank.getBalance(),connectionToDB);
+
+                bank.addTransaction(transaction,connectionToDB);
                 //set the items on the table
-                bank.setBalance(transaction.getTransactionType(), transaction.getTransactionAmount());
+               
                 balance.setText("Balance: " + bank.getBalance());
             } catch (NumberFormatException ex) {
                 if (transactionTypeDropdown.getValue().toString().equals("") || amountField.getText().equals("")) {
@@ -113,26 +120,42 @@ public class TransactionsGUI {
                     AlertError.displayError("Error", "Text entered where a number was expected", Alert.AlertType.ERROR);
                 }
 
-            }catch(NullPointerException ex){
-                 AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
+            } catch (NullPointerException ex) {
+                AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
+            } catch (SQLException ex) {
+                System.out.println("SQL Exception");
+            } catch (ClassNotFoundException ex) {
+                System.out.println("Class not found exception");
+            } catch (InstantiationException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         });
         //delete transaction button
         deleteTransaction.setOnAction(e -> {
-            try{
-                            //get the bank accounts that are selected
-            bank.removeTransaction(bankTransactions.getSelectionModel().getSelectedItems().get(0));
-            //remove bank accounts from the list
-            balance.setText("Balance: " + bank.getBalance());
-            }catch(NullPointerException ex){
+            try {
+                //get the bank accounts that are selected
+                transaction = bankTransactions.getSelectionModel().getSelectedItems().get(0);
+                bank.removeTransaction(transaction,connectionToDB);
+                //remove bank accounts from the list
+                balance.setText("Balance: " + bank.getBalance());
+            } catch (NullPointerException ex) {
                 // catch null pointer if nothing is selected
+            } catch (SQLException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         // add all item to a VBOX
         bankAccountBox.getChildren().addAll(accountInfoHBox, bankTransactions, addDeleteTransactionHBox);
         transactionScene = new Scene(bankAccountBox);
-        window.setScene(transactionScene);
-        window.showAndWait();
+        bankTransctionStage.setScene(transactionScene);
+        bankTransctionStage.showAndWait();
     }
 }

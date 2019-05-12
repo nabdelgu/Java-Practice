@@ -1,6 +1,7 @@
 package bank.GUI;
 
 import bank.account.BankAccount;
+import bank.account.Transaction;
 import com.db.ConnectToDb;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,6 +27,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -33,7 +35,7 @@ import javafx.stage.Stage;
  * @author Noah
  */
 public class BankAccountMain extends Application {
-
+    
     private static Label bankNameLbl, routingNumberLbl, accoutNumberLbl, balanceLbl;
     private static TextField bankName, routingNumber, accountNumber, balance, deleteBankAccountById;
     private static Button enterBankAccount, btnAddBankAccount, btnViewBankAccount, deleteBankAccount, viewBankAccountBtn;
@@ -41,25 +43,53 @@ public class BankAccountMain extends Application {
     private static Scene addBankAccount, homeScene, bankAccountListing;
     private static VBox homePageBox, bankAccountBox;
     private static HBox deleteBankAccountHBox;
-    private static Stage homeWindow, bankAccountsStage;
+    private static Stage homeWindow, bankAccountsStage, enterBankInfoStage;
     private static TableView<BankAccount> bankAccountsTable;
     private static ObservableList<BankAccount> bankAccountObsList;
     private static BankAccount bankAccount;
     private static Group root;
-
+    private static Connection connectionToDB = null;
+    
+    private static final String DELETE_BANK_ACCOUNT_SQL = "DELETE FROM BankAccounts WHERE BankName = ? and AccountNumber = ?";
+    private static final String SELECT_BANKS_SQL = "SELECT BankName, RoutingNumber, AccountNumber,Balance FROM BankAccounts";
+    private static final String SELECT_BANK_TRANSACTIONS_SQL = "SELECT BT.BankName,BT.AccountNumber,BT.TransactionID,TD.TransactionType,TD.TransactionAmount,TD.Balance FROM BankTransaction BT JOIN TransactionDetails TD on BT.TransactionID = TD.TransactionID WHERE BankName = ? and AccountNumber = ?";
+    private static final String DELETE_BANK_TRANSACTIONS_SQL = "DELETE FROM BankTransaction Where BankName = ? and AccountNumber = ?";
+    private static final String DELETE_TRANSACTION_DETAILS_SQL = "DELETE FROM TransactionDetails Where TransactionID in (SELECT TransactionID from BankTransaction Where BankName = ? and AccountNumber = ?)";
+    
     @Override
     public void start(Stage primaryStage) throws NumberFormatException, NullPointerException {
         try {
-            // bank account home page
-
-            bankAccountObsList = selectBankAccountFromDb(ConnectToDb.getConnection());
+            //connect to database
+            connectionToDB = ConnectToDb.getConnection();
+            ConnectToDb.createTablesIfNotExists(connectionToDB);
+            // bank account home page            
+            bankAccountObsList = loadBankAccountFromDb(connectionToDB);
         } catch (SQLException ex) {
-            Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("SQL Exception");
         } catch (ClassNotFoundException ex) {
+            System.out.println("Class not found exception");
+        } catch (InstantiationException ex) {
+            Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
             Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        // bank account home page
         homeWindow = primaryStage;
+        // enter bank info stage
+        enterBankInfoStage = new Stage();
+        enterBankInfoStage.initModality(Modality.APPLICATION_MODAL);
+        //close database when the home window is closer
+        homeWindow.setOnCloseRequest(e -> {
+            try {
+                connectionToDB.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        
         bankAccountsStage = new Stage();
+        bankAccountsStage.initModality(Modality.APPLICATION_MODAL);
         bankAccountsStage.setTitle("Bank Account List");
         btnAddBankAccount = new Button("Add Bank Account");
         btnViewBankAccount = new Button("View Bank Accounts");
@@ -67,14 +97,15 @@ public class BankAccountMain extends Application {
         homePageBox.setAlignment(Pos.CENTER);
         homePageBox.setSpacing(50);
         homePageBox.getChildren().addAll(btnAddBankAccount, btnViewBankAccount);
+        homePageBox.setAlignment(Pos.CENTER);
         homeScene = new Scene(homePageBox, 300, 250);
         homeWindow.setTitle("Bank Home");
         homeWindow.setScene(homeScene);
         homeWindow.show();
         //add bank account button
         btnAddBankAccount.setOnAction(e -> {
-            homeWindow.setScene(addBankAccount);
-            homeWindow.show();
+            enterBankInfoStage.setScene(addBankAccount);
+            enterBankInfoStage.show();
         });
         //view bank acccount button
         btnViewBankAccount.setOnAction(e -> {
@@ -84,12 +115,12 @@ public class BankAccountMain extends Application {
         });
         // add bank account scene
         addBankAccount = new Scene(new Group(), 450, 250);
-
+        
         bankName = new TextField();
         routingNumber = new TextField();
         accountNumber = new TextField();
         balance = new TextField();
-
+        
         grid = new GridPane();
         grid.setVgap(4);
         grid.setHgap(10);
@@ -99,7 +130,7 @@ public class BankAccountMain extends Application {
         routingNumberLbl = new Label("Routing Number");
         accoutNumberLbl = new Label("Account Number");
         balanceLbl = new Label("Balance");
-
+        
         enterBankAccount = new Button("Enter");
         // add items to the grid
         grid.add(bankNameLbl, 0, 0);
@@ -119,7 +150,7 @@ public class BankAccountMain extends Application {
 
         //define field to input account number to delete
         deleteBankAccountById = new TextField();
-        deleteBankAccountById.setPromptText("Accoumt Numbber");
+        deleteBankAccountById.setPromptText("Account Number");
 
         // delete account button
         deleteBankAccount = new Button("Delete");
@@ -128,19 +159,17 @@ public class BankAccountMain extends Application {
         // delete bank account button
         deleteBankAccount.setOnAction(e -> {
             try {
-                deleteBankAccountSelected(ConnectToDb.getConnection());
+                deleteBankAccountSelected(connectionToDB);
             } catch (SQLException ex) {
-                System.out.println("SQL Exception");
-            } catch (ClassNotFoundException ex) {
-                System.out.println("Class not Found Exception");
+                System.out.println("SQLException");
             }
         });
-
+        
         deleteBankAccountHBox.getChildren().addAll(viewBankAccountBtn, deleteBankAccount);
-
+        
         root = (Group) addBankAccount.getRoot();
         root.getChildren().add(grid);
-        homeWindow.setTitle("Enter Bank Information");
+        homeWindow.setTitle("Bank Home");
 
         //Bank Name column
         TableColumn<BankAccount, String> bankNameClm = new TableColumn<>("Bank Name");
@@ -161,13 +190,13 @@ public class BankAccountMain extends Application {
         TableColumn<BankAccount, Double> balanceClm = new TableColumn<>("Balance");
         balanceClm.setMinWidth(200);
         balanceClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
-
+        
         bankAccountsTable = new TableView();
         //add items to grid
         //bankAccountsTable.setItems(bankAccountList);
         //add columns to table
         bankAccountsTable.getColumns().addAll(bankNameClm, routingNumberClm, accountNumberClm, balanceClm);
-
+        
         bankAccountBox = new VBox();
         //Add bank accounts   table to the VBox
         bankAccountBox.getChildren().addAll(bankAccountsTable, deleteBankAccountHBox);
@@ -177,78 +206,110 @@ public class BankAccountMain extends Application {
 
         // enter bank account information
         enterBankAccount.setOnAction(e -> {
+            
             try {
-                bankAccount = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()), true);
+                bankAccount = new BankAccount(bankName.getText(), Integer.parseInt(routingNumber.getText()), Integer.parseInt(accountNumber.getText()), Double.parseDouble(balance.getText()), connectionToDB);
                 bankAccountObsList.add(bankAccount);
                 bankName.clear();
                 routingNumber.clear();
                 accountNumber.clear();
                 balance.clear();
                 // bankAccounts.add(b);
-                homeWindow.setScene(homeScene);
+                enterBankInfoStage.close();
             } catch (NumberFormatException ex) {
-                if (bankName.getText().equals("") || routingNumber.getText().equals(null) || accountNumber.getText().equals("") || balance.getText().equals(null)) {
+                if (bankName.getText().equals("") || routingNumber.getText().equals("") || accountNumber.getText().equals("") || balance.getText().equals("")) {
                     AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
                 } else {
                     AlertError.displayError("Error", "Text entered where a number was expected", Alert.AlertType.ERROR);
                 }
+            } catch (SQLException ex) {
+                Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         });
         // view bank account invoke TransactionGUI class method
         viewBankAccountBtn.setOnMouseClicked(e -> {
             try {
-                TransactionsGUI.getBankAccount(bankAccountsTable.getSelectionModel().getSelectedItem());
+                TransactionsGUI.getBankAccount(bankAccountsTable.getSelectionModel().getSelectedItem(), connectionToDB);
             } catch (NullPointerException ex) {
                 //nothing selected
             }
-
+            
         });
     }
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-
+    
+    public static void main(String[] args) {
         launch(args);
-
+        
     }
-
-    //button to delete bank account
-    public static void deleteBankAccountSelected(Connection c) throws SQLException{
+    
+    public static void deleteBankAccountSelected(Connection c) throws SQLException {
         //get list of items selected
         // ObservableList<BankAccount> bankAccountsSelected;
         //get the bank accounts that are selected
         //remove bank accounts from the list
-            BankAccount b = bankAccountsTable.getSelectionModel().getSelectedItems().get(0);
+        BankAccount b = bankAccountsTable.getSelectionModel().getSelectedItems().get(0);
 
-            String deleteBankSQL = "DELETE FROM BankAccounts WHERE BankName = ? and AccountNumber = ?";
-            PreparedStatement deleteBank = c.prepareStatement(deleteBankSQL);
-            deleteBank.setString(1, b.getBankName());
-            deleteBank.setInt(2, b.getAccountNo());
-            deleteBank.executeUpdate();
-            bankAccountObsList.remove(b);
-            c.close();
+        //Delete from BankAccount table
+        PreparedStatement deleteBank = c.prepareStatement(DELETE_BANK_ACCOUNT_SQL);
+        deleteBank.setString(1, b.getBankName());
+        deleteBank.setInt(2, b.getAccountNo());
+        deleteBank.executeUpdate();
+
+        //Delete from TranscationDetails table
+        PreparedStatement selectDeletedTranactions = c.prepareStatement(DELETE_TRANSACTION_DETAILS_SQL);
+        selectDeletedTranactions.setString(1, b.getBankName());
+        selectDeletedTranactions.setInt(2, b.getAccountNo());
+        selectDeletedTranactions.executeUpdate();
+        //delete from BankTransactions table
+        
+        PreparedStatement deleteBankTransactions = c.prepareStatement(DELETE_BANK_TRANSACTIONS_SQL);
+        deleteBankTransactions.setString(1, b.getBankName());
+        deleteBankTransactions.setInt(2, b.getAccountNo());
+        deleteBankTransactions.executeUpdate();
+        
+        bankAccountObsList.remove(b);
+        
     }
-
-    public static ObservableList<BankAccount> selectBankAccountFromDb(Connection c) {
+    
+    public static ObservableList<BankAccount> loadBankAccountFromDb(Connection c) {
         ObservableList<BankAccount> bankAccounts = FXCollections.observableArrayList();
         try {
+            // insert BankAccount object from database        
+            Statement selectBanks = c.createStatement();
+            ResultSet rsSelectBanks = selectBanks.executeQuery(SELECT_BANKS_SQL);
+            
+            while (rsSelectBanks.next()) {
+                // add bank object
+                BankAccount b = new BankAccount(rsSelectBanks.getString("BankName"), rsSelectBanks.getInt("RoutingNumber"), rsSelectBanks.getInt("AccountNumber"), rsSelectBanks.getDouble("Balance"));
+                bankAccounts.add(b);
+                
+                final PreparedStatement selectBankTransactions = c.prepareStatement(SELECT_BANK_TRANSACTIONS_SQL);
+                selectBankTransactions.setString(1, rsSelectBanks.getString("BankName"));
+                selectBankTransactions.setInt(2, rsSelectBanks.getInt("AccountNumber"));
 
-            String selectBanksSQL = "SELECT BankName, RoutingNumber, AccountNumber,Balance FROM BankAccounts";
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(selectBanksSQL);
-
-            while (rs.next()) {
-                System.out.println(rs.getString("BankName"));
-                System.out.println(rs.getInt("RoutingNumber"));
-                System.out.println(rs.getInt("AccountNumber"));
-                System.out.println(rs.getDouble("Balance"));
-                bankAccounts.add(new BankAccount(rs.getString("BankName"), rs.getInt("RoutingNumber"), rs.getInt("AccountNumber"), rs.getDouble("Balance"), false));
+                // add transactions for that bank
+                ResultSet rsSelectBankTransactions = selectBankTransactions.executeQuery();
+                while (rsSelectBankTransactions.next()) {
+                    b.addTransaction(new Transaction(rsSelectBankTransactions.getInt("TransactionID"), rsSelectBankTransactions.getString("TransactionType"), rsSelectBankTransactions.getDouble("TransactionAmount"), rsSelectBankTransactions.getDouble("Balance")));
+                }
+                
             }
-            c.close();
         } catch (SQLException ex) {
+            Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
             Logger.getLogger(BankAccountMain.class.getName()).log(Level.SEVERE, null, ex);
         }
         return bankAccounts;
     }
-
+    
 }

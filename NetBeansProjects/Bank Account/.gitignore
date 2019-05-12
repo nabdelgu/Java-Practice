@@ -11,5 +11,5 @@ dist/
 nbdist/
 .nb-gradle/
 *.db
-
+CreateeBankTables.sql
 # End of https://www.gitignore.io/api/netbeans
