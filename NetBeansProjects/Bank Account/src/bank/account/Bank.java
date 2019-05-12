@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bank.account;
 
 /**
- *
+ * Bank abstract class with the properties bankName and routing number
  * @author noaha
  */
 public abstract class Bank {

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author noaha
+ * @since 05/12/2019
  */
 public final class Transaction {
 
@@ -19,32 +20,42 @@ public final class Transaction {
     private double transactionAmount;
     private double balance;
 
-    public Transaction(String transactionType, double transactionAmount, double balance, Connection connectToDb) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        this.transactionID = getNextTransactionID(connectToDb);
+    /**
+     *
+     * Constructor when a new transaction is created
+     *
+     * @param transactionType
+     * @param transactionAmount
+     * @param balance
+     * @param connectionToDb
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    public Transaction(String transactionType, double transactionAmount, double balance, Connection connectionToDb) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        this.transactionID = getNextTransactionID(connectionToDb);
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
         this.balance = balance;
-        /*if (transactionType.equals("Withdraw")) {
-            this.balance = balance - transactionAmount;
-        }
-
-        if (transactionType.equals("Deposit")) {
-            this.balance = balance + transactionAmount;
-        }*/
     }
 
+    /**
+     * Constructor called transactions are loaded in from the database
+     * @param transactionID
+     * @param transactionType
+     * @param transactionAmount
+     * @param balance
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException 
+     */
     public Transaction(int transactionID, String transactionType, double transactionAmount, double balance) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.transactionID = transactionID;
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
         this.balance = balance;
-        /* if (transactionType.equals("Withdraw")) {
-            this.balance = balance - transactionAmount;
-        }
-
-        if (transactionType.equals("Deposit")) {
-            this.balance = balance + transactionAmount;
-        }*/
     }
 
     public int getTransactionID() {
@@ -83,12 +94,19 @@ public final class Transaction {
         this.balance = balance;
     }
 
-    public static int getNextTransactionID(Connection c) {
+    /**
+     * 
+     * Gets the next TransactionID
+     * 
+     * @param connectionToDb
+     * @return int
+     */
+    public static int getNextTransactionID(Connection connectionToDb) {
         int nextTransactionID = 0;
         try {
 
             String maxTransactionNumber = "SELECT MAX(TransactionID) AS TransactionID FROM TransactionDetails";
-            Statement stmt = c.createStatement();
+            Statement stmt = connectionToDb.createStatement();
             ResultSet rs = stmt.executeQuery(maxTransactionNumber);
 
             return rs.getInt("TransactionID") + 1;

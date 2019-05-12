@@ -31,7 +31,11 @@ import javafx.stage.Stage;
 
 /**
  *
+ * Created to handle BankTransaction
+ *
  * @author Noah
+ * @since 05/12/2019
+ *
  */
 public class TransactionsGUI {
 
@@ -47,14 +51,23 @@ public class TransactionsGUI {
     private static Button btnAddTransaction, deleteTransaction;
     private static Transaction transaction;
 
-    public static void getBankAccount(BankAccount bank,Connection connectionToDB) throws NumberFormatException, NullPointerException {
+    /**
+     *
+     * Handles the adding and deletion of new bank transactions
+     *
+     * @param bank
+     * @param connectionToDB
+     * @throws NumberFormatException
+     * @throws NullPointerException
+     */
+    public static void getBankAccount(BankAccount bank, Connection connectionToDB) throws NumberFormatException, NullPointerException {
+        //create the stage and set its properties
         bankTransctionStage = new Stage();
-        
         bankTransctionStage.initModality(Modality.APPLICATION_MODAL);
         bankTransctionStage.setTitle("Transactions");
         bankTransctionStage.setMinWidth(250);
 
-        // fill in bank information
+        // fill labels with the currect bank information
         bankName = new Label();
         bankName.setText("Bank Name: " + bank.getBankName());
         routingNumber = new Label();
@@ -64,25 +77,25 @@ public class TransactionsGUI {
         balance = new Label();
         balance.setText("Balance: " + Double.toString(bank.getBalance()));
 
+        //create a HBOX to store the bank information labels
         accountInfoHBox = new HBox(30);
         accountInfoHBox.setAlignment(Pos.TOP_CENTER);
         accountInfoHBox.setPadding(new Insets(15, 12, 15, 12));
         accountInfoHBox.getChildren().addAll(bankName, routingNumber, accountNumber, balance);
 
+        // create a TableView to store the bank transactions
         bankTransactions = new TableView();
         bankTransactions.setItems(bank.getTransactions());
-        // define table columns
-        //Transaction type
+
+        // define table columns     
         transactionType = new TableColumn<>("Transaction Type");
         transactionType.setMinWidth(400);
         transactionType.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
 
-        // Transaction Amount
         transactionAmount = new TableColumn<>("Transaction Amount");
         transactionAmount.setMinWidth(200);
         transactionAmount.setCellValueFactory(new PropertyValueFactory<>("transactionAmount"));
 
-        //Account Number Column
         balanceClm = new TableColumn<>("Balance");
         balanceClm.setMinWidth(200);
         balanceClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
@@ -90,10 +103,11 @@ public class TransactionsGUI {
         //add columns to table
         bankTransactions.getColumns().addAll(transactionType, transactionAmount, balanceClm);
 
-        bankAccountBox = new VBox();
         //Add bank accounts table to the VBox
+        bankAccountBox = new VBox();
         transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(TransactionType.getArrayTransaction()));
 
+        // Create text fields to input the transaction info
         amountField = new TextField();
         amountField.setPromptText("Amount");
         balanceField = new TextField();
@@ -102,16 +116,16 @@ public class TransactionsGUI {
         deleteTransaction = new Button("Delete");
         addDeleteTransactionHBox = new HBox();
         addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown, amountField, btnAddTransaction, deleteTransaction);
-        // add transaction button
+
+        // Handles the addition of a new transaction
         btnAddTransaction.setOnAction(e -> {
-
             try {
-                 bank.setBalance(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()),connectionToDB);
-                transaction = new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), bank.getBalance(),connectionToDB);
+                // set the new bank balance
+                bank.setBalance(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), connectionToDB);
 
-                bank.addTransaction(transaction,connectionToDB);
-                //set the items on the table
-               
+                //add the new transaction to the bank
+                bank.addTransaction(new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), bank.getBalance(), connectionToDB), connectionToDB);
+                //set the new bank balance to the label
                 balance.setText("Balance: " + bank.getBalance());
             } catch (NumberFormatException ex) {
                 if (transactionTypeDropdown.getValue().toString().equals("") || amountField.getText().equals("")) {
@@ -126,33 +140,26 @@ public class TransactionsGUI {
                 System.out.println("SQL Exception");
             } catch (ClassNotFoundException ex) {
                 System.out.println("Class not found exception");
-            } catch (InstantiationException ex) {
-                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
+            } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        //delete transaction button
+        // Handles the deletion of transctions
         deleteTransaction.setOnAction(e -> {
             try {
                 //get the bank accounts that are selected
                 transaction = bankTransactions.getSelectionModel().getSelectedItems().get(0);
-                bank.removeTransaction(transaction,connectionToDB);
                 //remove bank accounts from the list
+                bank.removeTransaction(transaction, connectionToDB);
+                // set the new bank balance to the label
                 balance.setText("Balance: " + bank.getBalance());
             } catch (NullPointerException ex) {
                 // catch null pointer if nothing is selected
-            } catch (SQLException ex) {
-                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InstantiationException ex) {
-                Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
+            } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(TransactionsGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        // add all item to a VBOX
+        // All items are added to a VBox
         bankAccountBox.getChildren().addAll(accountInfoHBox, bankTransactions, addDeleteTransactionHBox);
         transactionScene = new Scene(bankAccountBox);
         bankTransctionStage.setScene(transactionScene);

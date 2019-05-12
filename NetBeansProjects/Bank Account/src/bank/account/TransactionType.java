@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bank.account;
 
 
 /**
  *
+ * Enum created to define static values for transaction types
+ * 
  * @author noaha
+ * @05/12/2019
  */
 public enum TransactionType {
     Withdraw("Withdraw"),Deposit("Deposit");
@@ -20,7 +18,10 @@ public enum TransactionType {
     public String getDescription() {
         return description;
     }
-     
+     /**
+      * Returns an array list of transactionTypes
+      * @return String[] 
+      */
     public static String[] getArrayTransaction(){
         final String transactionTypes[] = {Withdraw.getDescription(), Deposit.getDescription()};
         return transactionTypes;

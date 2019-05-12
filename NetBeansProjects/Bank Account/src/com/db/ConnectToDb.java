@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.db;
 
 import java.sql.*;
 
 /**
- *
+ * Creates a connection to the database and handles table creation
  * @author Noah
+ * @since 05/12/2019
+ * 
  */
 public class ConnectToDb {
 
@@ -17,7 +14,7 @@ public class ConnectToDb {
     private static final String DATABASE_DRIVER = "org.sqlite.JDBC";
     private static final String DATABASE_NAME = "jdbc:sqlite:BankDatabase.db";
 
-    //database tables
+    // DDL to create the database tables if they do not exist;
     private static final String CREATE_BANK_ACCOUNT_DDL = "CREATE TABLE IF NOT EXISTS BankAccounts( \n"
             + "    BankName TEXT NOT NULL,\n"
             + "    RoutingNumber INTEGER NOT NULL, \n"
@@ -64,6 +61,16 @@ public class ConnectToDb {
         }
         
     }*/
+    /**
+     * 
+     * Creates and returns a database connection
+     * 
+     * @return Connection
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException 
+     */
     public static Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class.forName(DATABASE_DRIVER);
         connection = DriverManager.getConnection(DATABASE_NAME);
@@ -71,6 +78,13 @@ public class ConnectToDb {
         return connection;
     }
 
+    /**
+     * 
+     * Creates the database tables if they do not already exist
+     * 
+     * @param c
+     * @throws SQLException 
+     */
     public static void createTablesIfNotExists(Connection c) throws SQLException {
         Statement stmt = connection.createStatement();
         //Create BankAccount table
