@@ -8,7 +8,7 @@ My motivation behind this project was to design a application that can be useful
 
 # How to Use?
 
-**How to run:** Run the BankAccountMain.java file
+**How to run:** Run the BankAccountMain.java file<br />
 **Adding a bank accounnt:** Add a bank account by hitting the Add Bank Account button then fill in all the information and hit enter<br />
 **Viewing a bank account:** View Bank Accounts by hitting the View Bank Account button. You will them be take to a list of all the bank accounts saved<br />
 **Deleting a bank account:** First hit View Bank Accounts then click on the one you would like to delete and hit the delete button.<br />
