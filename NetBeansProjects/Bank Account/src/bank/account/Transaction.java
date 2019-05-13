@@ -19,6 +19,7 @@ public final class Transaction {
     private String transactionType;
     private double transactionAmount;
     private double balance;
+    private String transactionDetails;
 
     /**
      *
@@ -27,35 +28,48 @@ public final class Transaction {
      * @param transactionType
      * @param transactionAmount
      * @param balance
+     * @param transactionDetails
      * @param connectionToDb
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public Transaction(String transactionType, double transactionAmount, double balance, Connection connectionToDb) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public Transaction(String transactionType, double transactionAmount, double balance, String transactionDetails, Connection connectionToDb) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.transactionID = getNextTransactionID(connectionToDb);
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
         this.balance = balance;
+        this.transactionDetails = transactionDetails;
     }
 
     /**
      * Constructor called transactions are loaded in from the database
+     *
      * @param transactionID
      * @param transactionType
      * @param transactionAmount
      * @param balance
+     * @param transactionDetails
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws InstantiationException
-     * @throws IllegalAccessException 
+     * @throws IllegalAccessException
      */
-    public Transaction(int transactionID, String transactionType, double transactionAmount, double balance) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public Transaction(int transactionID, String transactionType, double transactionAmount, double balance, String transactionDetails) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.transactionID = transactionID;
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
         this.balance = balance;
+        this.transactionDetails = transactionDetails;
+    }
+
+    public String getTransactionDetails() {
+        return transactionDetails;
+    }
+
+    public void setTransactionDetails(String transactionDetails) {
+        this.transactionDetails = transactionDetails;
     }
 
     public int getTransactionID() {
@@ -95,9 +109,9 @@ public final class Transaction {
     }
 
     /**
-     * 
+     *
      * Gets the next TransactionID
-     * 
+     *
      * @param connectionToDb
      * @return int
      */

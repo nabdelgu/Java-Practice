@@ -9,7 +9,7 @@ package bank.account;
  * @05/12/2019
  */
 public enum TransactionType {
-    Withdraw("Withdraw"),Deposit("Deposit");
+    Withdraw("Withdraw"),Deposit("Deposit"),Purchase("Purchase");
 
     private TransactionType(String description) {
         this.description = description;
@@ -23,7 +23,7 @@ public enum TransactionType {
       * @return String[] 
       */
     public static String[] getArrayTransaction(){
-        final String transactionTypes[] = {Withdraw.getDescription(), Deposit.getDescription()};
+        final String transactionTypes[] = {Withdraw.getDescription(), Deposit.getDescription(),Purchase.getDescription()};
         return transactionTypes;
     }
     private final String description;

@@ -1,12 +1,12 @@
-#Bank Tracker
+# Bank Tracker
 
 This application is GUI driven written in java and javaFX. It uses a SQLite database to store the applications data. This application allows you to input a bank account and manage its transactions either a withdraw or a deposits. Your bank balance will be updated as transactions are inputed. 
 
-EMotivation
+# Motivation
 
 My motivation behind this project was to design a application that can be useful to keep track of withdraws and deposits from your bank accounts. It alows you to view all of your banks information in one place. 
 
-#How to Use?
+# How to Use?
 
 How to run: Run the BankAccountMain.java file
 Adding a bank accounnt: Add a bank account by hitting the Add Bank Account button then fill in all the information and hit enter

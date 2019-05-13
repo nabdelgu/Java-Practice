@@ -28,7 +28,7 @@ public class BankAccount extends Bank {
     private static final String DELETE_BANK_TRANSACTION_DETAILS_SQL = "DELETE FROM BankTransaction WHERE BankName = ? and AccountNumber = ? and TransactionID = ?";
     private static final String INSERT_BANK_ACCOUNT_SQL = "INSERT INTO BankAccounts(BankName,RoutingNumber,AccountNumber,Balance) VALUES(?,?,?,?)";
     private static final String INSERT_BANK_TRANSACTION_SQL = "INSERT INTO BankTransaction(BankName,AccountNumber,TransactionID) VALUES(?,?,?)";
-    private static final String INSERT_TRANSACTION_DETAILS_SQL = "INSERT INTO TransactionDetails(TransactionID,TransactionType,TransactionAmount,Balance) VALUES(?,?,?,?)";
+    private static final String INSERT_TRANSACTION_DETAILS_SQL = "INSERT INTO TransactionDetails(TransactionID,TransactionType,TransactionAmount,Balance,TransactionDetails) VALUES(?,?,?,?,?)";
 
     /**
      *
@@ -100,7 +100,7 @@ public class BankAccount extends Bank {
      * @throws IllegalAccessException
      */
     public void setBalance(String transactionType, double transactionAmount, Connection connectionToDB) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        if (transactionType.equals(TransactionType.Withdraw.getDescription())) {
+        if (transactionType.equals(TransactionType.Withdraw.getDescription()) || transactionType.equals(TransactionType.Purchase.getDescription())) {
             this.balance = balance - transactionAmount;
         } else if (transactionType.equals(TransactionType.Deposit.getDescription())) {
             this.balance = balance + transactionAmount;
@@ -141,9 +141,9 @@ public class BankAccount extends Bank {
         deleteBankTransactionDetails.executeUpdate();
 
         //set the new balance after transaction is removed
-        if (transaction.getTransactionType().equals(TransactionType.Withdraw.getDescription())) {
+        if (transaction.getTransactionType().equals(TransactionType.Withdraw.getDescription()) || transaction.getTransactionType().equals(TransactionType.Purchase.getDescription())) {
             this.balance = this.balance + transaction.getTransactionAmount();
-        } else if (transaction.getTransactionType().equals(TransactionType.Deposit.getDescription())) {
+        } else if (transaction.getTransactionType().equals(TransactionType.Deposit.getDescription()) ) {
             this.balance = this.balance - transaction.getTransactionAmount();
         }
 
@@ -188,6 +188,7 @@ public class BankAccount extends Bank {
         addTransactionDetails.setString(2, transaction.getTransactionType());
         addTransactionDetails.setDouble(3, transaction.getTransactionAmount());
         addTransactionDetails.setDouble(4, transaction.getBalance());
+        addTransactionDetails.setString(5, transaction.getTransactionDetails());
         addTransactionDetails.executeUpdate();
         transactions.add(transaction);
     }

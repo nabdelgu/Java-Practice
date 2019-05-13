@@ -44,9 +44,9 @@ public class TransactionsGUI {
     private static Label bankName, routingNumber, accountNumber, balance;
     private static HBox accountInfoHBox, addDeleteTransactionHBox;
     private static VBox bankAccountBox;
-    private static TableColumn<Transaction, String> transactionType, transactionAmount, balanceClm;
+    private static TableColumn<Transaction, String> transactionType, transactionAmount, transcationDetails, balanceClm;
     private static TableView<Transaction> bankTransactions;
-    private static TextField amountField, balanceField;
+    private static TextField amountField, balanceField, transactionDetailsField;
     private static ComboBox transactionTypeDropdown;
     private static Button btnAddTransaction, deleteTransaction;
     private static Transaction transaction;
@@ -96,12 +96,16 @@ public class TransactionsGUI {
         transactionAmount.setMinWidth(200);
         transactionAmount.setCellValueFactory(new PropertyValueFactory<>("transactionAmount"));
 
+        transcationDetails = new TableColumn<>("Transaction Details");
+        transcationDetails.setMinWidth(200);
+        transcationDetails.setCellValueFactory(new PropertyValueFactory<>("transactionDetails"));
+
         balanceClm = new TableColumn<>("Balance");
         balanceClm.setMinWidth(200);
         balanceClm.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         //add columns to table
-        bankTransactions.getColumns().addAll(transactionType, transactionAmount, balanceClm);
+        bankTransactions.getColumns().addAll(transactionType, transactionAmount, transcationDetails, balanceClm);
 
         //Add bank accounts table to the VBox
         bankAccountBox = new VBox();
@@ -112,23 +116,27 @@ public class TransactionsGUI {
         amountField.setPromptText("Amount");
         balanceField = new TextField();
         balanceField.setPromptText("Balance");
+        transactionDetailsField = new TextField();
+        transactionDetailsField.setPromptText("TransactionDetails");
         btnAddTransaction = new Button("Add Transaction");
         deleteTransaction = new Button("Delete");
         addDeleteTransactionHBox = new HBox();
-        addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown, amountField, btnAddTransaction, deleteTransaction);
+        addDeleteTransactionHBox.getChildren().addAll(transactionTypeDropdown, amountField, transactionDetailsField, btnAddTransaction, deleteTransaction);
 
         // Handles the addition of a new transaction
         btnAddTransaction.setOnAction(e -> {
             try {
                 // set the new bank balance
                 bank.setBalance(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), connectionToDB);
-
+                System.out.println("1");
                 //add the new transaction to the bank
-                bank.addTransaction(new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), bank.getBalance(), connectionToDB), connectionToDB);
+                bank.addTransaction(new Transaction(transactionTypeDropdown.getValue().toString(), Double.parseDouble(amountField.getText()), bank.getBalance(), transactionDetailsField.getText(), connectionToDB), connectionToDB);
+                System.out.println("2");
                 //set the new bank balance to the label
+                System.out.println("3");
                 balance.setText("Balance: " + bank.getBalance());
             } catch (NumberFormatException ex) {
-                if (transactionTypeDropdown.getValue().toString().equals("") || amountField.getText().equals("")) {
+                if (transactionTypeDropdown.getValue().toString().equals("") || amountField.getText().equals("") || transactionDetailsField.getText().equals("")) {
                     AlertError.displayError("Error", "All fields must be entered to continue", Alert.AlertType.ERROR);
                 } else {
                     AlertError.displayError("Error", "Text entered where a number was expected", Alert.AlertType.ERROR);

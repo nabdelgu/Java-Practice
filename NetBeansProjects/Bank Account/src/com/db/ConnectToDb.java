@@ -4,9 +4,10 @@ import java.sql.*;
 
 /**
  * Creates a connection to the database and handles table creation
+ *
  * @author Noah
  * @since 05/12/2019
- * 
+ *
  */
 public class ConnectToDb {
 
@@ -33,8 +34,9 @@ public class ConnectToDb {
             + "	TransactionType	TEXT NOT NULL,\n"
             + "	TransactionAmount	INTEGER NOT NULL,\n"
             + "	Balance	INTEGER NOT NULL,\n"
+            + "	TransactionDetails	TEXT,\n"
             + "	PRIMARY KEY(TransactionID)\n"
-            + ")";
+            + ");";
 
     /*public static void main(String[] args) {
         
@@ -62,14 +64,14 @@ public class ConnectToDb {
         
     }*/
     /**
-     * 
+     *
      * Creates and returns a database connection
-     * 
+     *
      * @return Connection
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws InstantiationException
-     * @throws IllegalAccessException 
+     * @throws IllegalAccessException
      */
     public static Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class.forName(DATABASE_DRIVER);
@@ -79,11 +81,11 @@ public class ConnectToDb {
     }
 
     /**
-     * 
+     *
      * Creates the database tables if they do not already exist
-     * 
+     *
      * @param c
-     * @throws SQLException 
+     * @throws SQLException
      */
     public static void createTablesIfNotExists(Connection c) throws SQLException {
         Statement stmt = connection.createStatement();
