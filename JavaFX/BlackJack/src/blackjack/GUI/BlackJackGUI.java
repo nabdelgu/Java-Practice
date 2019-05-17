@@ -30,6 +30,7 @@ public class BlackJackGUI extends Application {
     private static Label comboBoxLabel, player1, player2, player3, player4, player5;
     private static TextField text1, text2, text3, text4, text5;
     private static Button confirmPlayers;
+    // private static final TextField textFieldArray[] = {text0, text1, text2, text3, text4};
 
     @Override
     public void start(Stage primaryStage) {
@@ -63,20 +64,70 @@ public class BlackJackGUI extends Application {
         grid.add(comboBoxLabel, 0, 0);
         grid.add(transactionTypeDropdown, 1, 0);
         //add text labels
-        grid.add(player1, 0, 1);
+        /* grid.add(player1, 0, 1);
         grid.add(player2, 0, 2);
         grid.add(player3, 0, 3);
         grid.add(player4, 0, 4);
-        grid.add(player5, 0, 5);
+        grid.add(player5, 0, 5);*/
 // add text fields
-        grid.add(text1, 1, 1);
+        /*grid.add(text1, 1, 1);
         grid.add(text2, 1, 2);
         grid.add(text3, 1, 3);
         grid.add(text4, 1, 4);
-        grid.add(text5, 1, 5);
+        grid.add(text5, 1, 5);*/
 
         //add button
         grid.add(confirmPlayers, 1, 7);
+
+        transactionTypeDropdown.setOnAction(e -> {
+            int number = Integer.parseInt(transactionTypeDropdown.getValue().toString());
+            grid.getChildren().removeAll(player1, player2, player3, player4, player5,text1, text2, text3, text4, text5);
+            switch (number) {
+                case 1:
+                    grid.add(player1, 0, 1);
+                    grid.add(text1, 1, 1);
+                    break; // break is optional
+
+                case 2:
+                    grid.add(player1, 0, 1);
+                    grid.add(text1, 1, 1);
+                    grid.add(player2, 0, 2);
+                    grid.add(text2, 1, 2);
+                    break;
+                case 3:
+                    grid.add(player1, 0, 1);
+                    grid.add(text1, 1, 1);
+                    grid.add(player2, 0, 2);
+                    grid.add(text2, 1, 2);
+                    grid.add(player3, 0, 3);
+                    grid.add(text3, 1, 3);
+                    break;
+                case 4:
+                    grid.add(player1, 0, 1);
+                    grid.add(text1, 1, 1);
+                    grid.add(player2, 0, 2);
+                    grid.add(text2, 1, 2);
+                    grid.add(player3, 0, 3);
+                    grid.add(text3, 1, 3);
+                    grid.add(player4, 0, 4);
+                    grid.add(text4, 1, 4);
+                    break;
+                case 5:
+                    grid.add(player1, 0, 1);
+                    grid.add(text1, 1, 1);
+                    grid.add(player2, 0, 2);
+                    grid.add(text2, 1, 2);
+                    grid.add(player3, 0, 3);
+                    grid.add(text3, 1, 3);
+                    grid.add(player4, 0, 4);
+                    grid.add(text4, 1, 4);
+                    grid.add(player5, 0, 5);
+                    grid.add(text5, 1, 5);
+                    break;
+                default:
+                // Statements
+            }
+        });
 
         //  StackPane root = new StackPane();
         //  root.getChildren().add(btn);
