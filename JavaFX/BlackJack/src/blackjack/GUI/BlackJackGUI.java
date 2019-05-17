@@ -5,17 +5,12 @@
  */
 package blackjack.GUI;
 
-import javafx.scene.control.Label;
+import blackjack.game.BlackJackPlayer;
+import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 /**
@@ -24,118 +19,34 @@ import javafx.stage.Stage;
  */
 public class BlackJackGUI extends Application {
 
-    private static GridPane grid;
+    /*private static GridPane grid;
     private static ComboBox transactionTypeDropdown;
     private static final int comboboxValues[] = {1, 2, 3, 4, 5};
     private static Label comboBoxLabel, player1, player2, player3, player4, player5;
     private static TextField text1, text2, text3, text4, text5;
     private static Button confirmPlayers;
-    // private static final TextField textFieldArray[] = {text0, text1, text2, text3, text4};
+    private Scene setupPlayers, playGame;
+     */
+    private static ArrayList<BlackJackPlayer> players;
+    private static Scene playGame;
+    private static Label playerName, roundScore, currentBalance;
+    private static HBox details;
 
     @Override
     public void start(Stage primaryStage) {
 
-        //combo box label
-        comboBoxLabel = new javafx.scene.control.Label("Number of players");
+        playerName = new Label("Player Name:");
+        roundScore = new Label("Round Score:");
+        currentBalance = new Label("Current Balance:");
 
-        //number of players drop down
-        transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(1, 2, 3, 4, 5));
+        details = new HBox();
 
-        //player name labels
-        player1 = new Label("Player1");
-        player2 = new Label("Player2");
-        player3 = new Label("Player3");
-        player4 = new Label("Player4");
-        player5 = new Label("Player5");
-        //player name text field
-        text1 = new TextField();
-        text2 = new TextField();
-        text3 = new TextField();
-        text4 = new TextField();
-        text5 = new TextField();
+        details.getChildren().addAll(playerName, roundScore, currentBalance);
 
-        //confirm players button
-        confirmPlayers = new Button("Enter");
+        playGame = new Scene(details, 400, 350);
 
-        grid = new GridPane();
-        grid.setVgap(10);
-        grid.setHgap(5);
-        grid.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(comboBoxLabel, 0, 0);
-        grid.add(transactionTypeDropdown, 1, 0);
-        //add text labels
-        /* grid.add(player1, 0, 1);
-        grid.add(player2, 0, 2);
-        grid.add(player3, 0, 3);
-        grid.add(player4, 0, 4);
-        grid.add(player5, 0, 5);*/
-// add text fields
-        /*grid.add(text1, 1, 1);
-        grid.add(text2, 1, 2);
-        grid.add(text3, 1, 3);
-        grid.add(text4, 1, 4);
-        grid.add(text5, 1, 5);*/
+        players = InitializePlayers.initializePlayers(primaryStage, playGame);
 
-        //add button
-        grid.add(confirmPlayers, 1, 7);
-
-        transactionTypeDropdown.setOnAction(e -> {
-            int number = Integer.parseInt(transactionTypeDropdown.getValue().toString());
-            grid.getChildren().removeAll(player1, player2, player3, player4, player5,text1, text2, text3, text4, text5);
-            switch (number) {
-                case 1:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    break; // break is optional
-
-                case 2:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    break;
-                case 3:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
-                    break;
-                case 4:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
-                    grid.add(player4, 0, 4);
-                    grid.add(text4, 1, 4);
-                    break;
-                case 5:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
-                    grid.add(player4, 0, 4);
-                    grid.add(text4, 1, 4);
-                    grid.add(player5, 0, 5);
-                    grid.add(text5, 1, 5);
-                    break;
-                default:
-                // Statements
-            }
-        });
-
-        //  StackPane root = new StackPane();
-        //  root.getChildren().add(btn);
-        Scene scene = new Scene(grid, 400, 350);
-
-        primaryStage.setTitle("Enter player names");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
     /**
