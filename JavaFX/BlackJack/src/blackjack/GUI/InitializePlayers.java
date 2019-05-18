@@ -137,8 +137,7 @@ public class InitializePlayers {
                 }
             }
             //go to play game scene
-            primaryStage.setScene(playGame);
-            primaryStage.show();
+            BlackJackGUI.placeBets(players);
 
         });
         return players;

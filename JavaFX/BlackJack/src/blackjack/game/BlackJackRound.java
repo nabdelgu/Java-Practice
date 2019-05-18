@@ -9,20 +9,22 @@ package blackjack.game;
  *
  * @author noaha
  */
-public class BlackJackPlayer {
-    private String player;
+public class BlackJackRound {
+    private BlackJackPlayer player;
     private int currentHoldings;
+    private int roundScore;
 
-    public BlackJackPlayer(String player, int currentHoldings) {
+    public BlackJackRound(BlackJackPlayer player, int currentHoldings, int roundScore) {
         this.player = player;
         this.currentHoldings = currentHoldings;
-    }
- 
-    public String getPlayer() {
+        this.roundScore = roundScore;
+    }    
+
+    public BlackJackPlayer getPlayer() {
         return player;
     }
 
-    public void setPlayer(String player) {
+    public void setPlayer(BlackJackPlayer player) {
         this.player = player;
     }
 
@@ -34,9 +36,17 @@ public class BlackJackPlayer {
         this.currentHoldings = currentHoldings;
     }
 
+    public int getRoundScore() {
+        return roundScore;
+    }
+
+    public void setRoundScore(int roundScore) {
+        this.roundScore = roundScore;
+    }
+
     @Override
     public String toString() {
-        return "BlackJackPlayer{" + "player=" + player + ", currentHoldings=" + currentHoldings + '}';
-    }   
-    
+        return "BlackJackRound{" + "player=" + player + ", currentHoldings=" + currentHoldings + ", roundScore=" + roundScore + '}';
+    }  
+       
 }

@@ -18,7 +18,7 @@ import java.util.Scanner;
 public class BlackJackPlay {
 
     private static final Scanner sc = new Scanner(System.in);
-    private static Random random = new Random();
+    private static final Random random = new Random();
     private static ArrayList<BlackJackPlayer> blackJackPlayers = new ArrayList<>();
     private static HashMap<BlackJackPlayer, Boolean> blackjackPlayersHm = new HashMap<BlackJackPlayer, Boolean>();
 
