@@ -15,6 +15,7 @@ import java.util.Scanner;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -55,6 +56,7 @@ public class BlackJackGUI extends Application {
     private static BlackJackRound blackJackRoundPlayer;
     private static ArrayList<BlackJackRound> blackJackRound = new ArrayList<>();
     private static int playerIndex = 0;
+    private static int maxScore = 0;
 
     @Override
     public void start(Stage primaryStage) {
@@ -110,6 +112,9 @@ public class BlackJackGUI extends Application {
         standButton.setDisable(true);
         placeBet.setDisable(false);
         betAmount.setDisable(false);
+        blackJackRound.clear();
+        roundScore.setText("Round Score: ");
+        playerIndex = 0;
         currentPlayer = players.get(playerIndex);
         playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
         currentBalance.setText("Player Holdings: " + Integer.toString(players.get(playerIndex).getCurrentHoldings()));
@@ -121,8 +126,8 @@ public class BlackJackGUI extends Application {
         window.show();
 
         placeBet.setOnAction(e -> {
-System.out.println(playerIndex);
-System.out.println(players.size() - 1);
+            System.out.println("Player Index: " + playerIndex);
+            // System.out.println(players.size() - 1);
             if (playerIndex <= players.size()) {
 
                 currentPlayer = players.get(playerIndex);
@@ -132,27 +137,29 @@ System.out.println(players.size() - 1);
 
                 //set next player labels
                 playerIndex++;
-               if (playerIndex <= players.size() - 1){
-                    
+                if ((playerIndex >= players.size())) {
+                    System.out.println("here1");
+                    placeBet.setDisable(true);
+                    betAmount.setDisable(true);
+                    betAmount.clear();
+                    playRound();
+                } else {
+                    System.out.println("here2");
                     currentPlayer = players.get(playerIndex);
                     playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
                     // betAmountLbl.setText("Wager Amount: " + betAmount.getText());
                     currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
                 }
-
-            } else if (playerIndex > players.size() - 1) {
-                placeBet.setDisable(true);
-                betAmount.setDisable(true);
-                betAmount.clear();
-                playRound();
-            }
-
+            } 
         });
 
     }
 
     private static void playRound() {
+        System.out.println(blackJackRound.get(0));
+        System.out.println(blackJackRound.get(1));
         playerIndex = 0;
+        maxScore = 0;
         hitButton.setDisable(false);
         standButton.setDisable(false);
         blackJackRoundPlayer = blackJackRound.get(playerIndex);
@@ -163,24 +170,34 @@ System.out.println(players.size() - 1);
 
         hitButton.setOnAction(e -> {
             blackJackRoundPlayer.addToRoundScore(rollDice() + rollDice());
+
             roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
             //player score is 21 or break
-            if (blackJackRoundPlayer.getRoundScore() >= 21) {
+            System.out.println("Player Index: " + playerIndex);
+            if (blackJackRoundPlayer.getRoundScore() >= 21 && playerIndex <= blackJackRound.size()) {
+                // if (playerIndex <= blackJackRound.size()) {
                 playerIndex++;
-                System.out.println("here");
-                System.out.println(playerIndex);
-                System.out.println(blackJackRound.size());
-                blackJackRoundPlayer = blackJackRound.get(playerIndex);
-                playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
-                currentBalance.setText("Player Holdings: " + Integer.toString(blackJackRoundPlayer.getPlayer().getCurrentHoldings()));
-                betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager());
-                currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings());
-            }
+                if (playerIndex <= players.size() - 1) {
+                    System.out.println("here");
+                    if (blackJackRoundPlayer.getRoundScore() > maxScore) {
+                        maxScore = blackJackRoundPlayer.getRoundScore();
+                    }
 
-            if (playerIndex == blackJackRound.size() - 1) {
-                //determine winner
-            }
+                    blackJackRoundPlayer = blackJackRound.get(playerIndex);
+                    playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
+                    currentBalance.setText("Player Holdings: " + Integer.toString(blackJackRoundPlayer.getPlayer().getCurrentHoldings()));
+                    betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager());
+                    currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings());
+                    roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
+                } else {
+                    hitButton.setDisable(true);
+                    standButton.setDisable(true);
+                    System.out.println("round over determine winner");
+                    determineWinner(maxScore);
+                }
+                // }
 
+            }
         });
 
         standButton.setOnAction(e -> {
@@ -189,17 +206,23 @@ System.out.println(players.size() - 1);
             System.out.println(blackJackRound.size() - 1);
 
             playerIndex++;
+            if (blackJackRoundPlayer.getRoundScore() > maxScore) {
+                maxScore = blackJackRoundPlayer.getRoundScore();
+            }
 
-            if (playerIndex != blackJackRound.size() - 1) {
+            if (playerIndex <= players.size() - 1) {
                 blackJackRoundPlayer = blackJackRound.get(playerIndex);
                 playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
                 currentBalance.setText("Player Holdings: " + Integer.toString(blackJackRoundPlayer.getPlayer().getCurrentHoldings()));
                 betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager());
                 currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings());
-
+                roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
                 //determine winner
             } else {
-
+                hitButton.setDisable(true);
+                standButton.setDisable(true);
+                System.out.println("round over determine winner");
+                determineWinner(maxScore);
             }
 
         });
@@ -279,24 +302,44 @@ System.out.println(players.size() - 1);
         return false;
     }
 
-    /* public static BlackJackPlayer determineWinner(int maxScore) {
+    public static void determineWinner(int maxScore) {
         ArrayList<BlackJackPlayer> winnerScoreBlackJackPlayers = new ArrayList<>();
-        for (BlackJackPlayer player : blackJackPlayers) {
-            System.out.println(player);
-            if (player.getScore() == maxScore) {
-                winnerScoreBlackJackPlayers.add(player);
+        int roundWinnings = 0;
+        BlackJackRound winnerPlayerRound = null;
+        //ArrayList<BlackJackRound> blackJackRound
+        for (BlackJackRound blackJackRound1 : blackJackRound) {
+            roundWinnings += blackJackRound1.getRoundWager();
+            System.out.println(blackJackRound1);
+            if (blackJackRound1.getRoundScore() == maxScore) {
+                winnerScoreBlackJackPlayers.add(blackJackRound1.getPlayer());
+                winnerPlayerRound = blackJackRound1;
             }
         }
         if (winnerScoreBlackJackPlayers.size() == 1) {
             //one winner
             System.out.println("here");
-            return winnerScoreBlackJackPlayers.get(0);
+            winnerScoreBlackJackPlayers.get(0).addToHoldings(roundWinnings);
+            Alert.displayError("Round Winner", winnerScoreBlackJackPlayers.get(0).getPlayer() + " has won this round and has won " + (roundWinnings - winnerPlayerRound.getRoundScore()) + "$.", AlertType.INFORMATION);
+            // return winnerScoreBlackJackPlayers.get(0);
         } else {
             //tie game
-            return null;
-        }
+            StringBuilder playerTied = new StringBuilder();
+            for (BlackJackRound blackJackRound2 : blackJackRound) {
+                if (winnerScoreBlackJackPlayers.get(winnerScoreBlackJackPlayers.size() - 1).equals(blackJackRound2)) {
+                    playerTied.append(blackJackRound2.getPlayer());
+                    playerTied.append(",");
+                } else {
+                    playerTied.append(blackJackRound2.getPlayer());
+                }
+            }
 
-    }*/
+            Alert.displayError("Round tie.", playerTied.toString() + " have tied", AlertType.INFORMATION);
+        }
+        
+        placeBets(players);
+
+    }
+
     /**
      * @param args the command line arguments
      */

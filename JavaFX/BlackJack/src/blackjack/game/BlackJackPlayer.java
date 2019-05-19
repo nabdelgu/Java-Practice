@@ -33,6 +33,10 @@ public class BlackJackPlayer {
     public void setCurrentHoldings(int currentHoldings) {
         this.currentHoldings = currentHoldings;
     }
+    
+    public void addToHoldings(int amount){
+        this.currentHoldings += amount;
+    }
 
     @Override
     public String toString() {
