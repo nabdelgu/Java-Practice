@@ -11,12 +11,12 @@ package blackjack.game;
  */
 public class BlackJackRound {
     private BlackJackPlayer player;
-    private int currentHoldings;
+    private int roundWager;
     private int roundScore;
 
-    public BlackJackRound(BlackJackPlayer player, int currentHoldings, int roundScore) {
+    public BlackJackRound(BlackJackPlayer player, int roundWager, int roundScore) {
         this.player = player;
-        this.currentHoldings = currentHoldings;
+        this.roundWager = roundWager;
         this.roundScore = roundScore;
     }    
 
@@ -28,12 +28,12 @@ public class BlackJackRound {
         this.player = player;
     }
 
-    public int getCurrentHoldings() {
-        return currentHoldings;
+    public int getRoundWager() {
+        return roundWager;
     }
 
-    public void setCurrentHoldings(int currentHoldings) {
-        this.currentHoldings = currentHoldings;
+    public void setRoundWager(int roundWager) {
+        this.roundWager = roundWager;
     }
 
     public int getRoundScore() {
@@ -43,10 +43,14 @@ public class BlackJackRound {
     public void setRoundScore(int roundScore) {
         this.roundScore = roundScore;
     }
+    
+    public void addToRoundScore(int diceRoll){
+        this.roundScore += diceRoll;
+    }
 
     @Override
     public String toString() {
-        return "BlackJackRound{" + "player=" + player + ", currentHoldings=" + currentHoldings + ", roundScore=" + roundScore + '}';
+        return "BlackJackRound{" + "player=" + player + ", roundWager=" + roundWager + ", roundScore=" + roundScore + '}';
     }  
        
 }

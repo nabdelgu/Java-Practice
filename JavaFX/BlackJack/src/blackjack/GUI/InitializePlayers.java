@@ -132,8 +132,8 @@ public class InitializePlayers {
             for (Node node : grid.getChildren()) {
                 if (node instanceof TextField) {
                     // clear
-                    System.out.println(((TextField) node).getText());
-                    players.add(new BlackJackPlayer(((TextField) node).getText(), 0));
+                  //  System.out.println(((TextField) node).getText());
+                    players.add(new BlackJackPlayer(((TextField) node).getText(), 100));
                 }
             }
             //go to play game scene
