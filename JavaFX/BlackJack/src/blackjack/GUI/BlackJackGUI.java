@@ -19,6 +19,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -55,6 +56,8 @@ public class BlackJackGUI extends Application {
     private static BlackJackPlayer currentPlayer;
     private static BlackJackRound blackJackRoundPlayer;
     private static ArrayList<BlackJackRound> blackJackRound = new ArrayList<>();
+    private static Image dice1,dice2;
+    
     private static int playerIndex = 0;
     private static int maxScore = 0;
 
@@ -84,9 +87,15 @@ public class BlackJackGUI extends Application {
         playerAction.getChildren().addAll(hitButton, standButton);
         playerAction.setAlignment(Pos.CENTER);
         borderPane = new BorderPane();
+        
+       // dice1 = new Image(".Images");
+       // dice2 = new Image();
+        
+        
         borderPane.setTop(details);
         borderPane.setLeft(playerAction);
         borderPane.setBottom(placeBets);
+        playGame = new Scene(borderPane, 400, 350);
 
         window = primaryStage;
         players = InitializePlayers.initializePlayers(primaryStage, playGame);
@@ -121,7 +130,6 @@ public class BlackJackGUI extends Application {
         // betAmountLbl.setText("Wager Amount: " + betAmount.getText());
         currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
 
-        playGame = new Scene(borderPane, 400, 350);
         window.setScene(playGame);
         window.show();
 
@@ -150,7 +158,7 @@ public class BlackJackGUI extends Application {
                     // betAmountLbl.setText("Wager Amount: " + betAmount.getText());
                     currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
                 }
-            } 
+            }
         });
 
     }
@@ -319,7 +327,7 @@ public class BlackJackGUI extends Application {
             //one winner
             System.out.println("here");
             winnerScoreBlackJackPlayers.get(0).addToHoldings(roundWinnings);
-            Alert.displayError("Round Winner", winnerScoreBlackJackPlayers.get(0).getPlayer() + " has won this round and has won " + (roundWinnings - winnerPlayerRound.getRoundScore()) + "$.", AlertType.INFORMATION);
+            Alert.displayError("Round Winner", winnerScoreBlackJackPlayers.get(0).getPlayer() + " has won this round and has won " + (roundWinnings - winnerPlayerRound.getRoundWager()) + "$.", AlertType.INFORMATION);
             // return winnerScoreBlackJackPlayers.get(0);
         } else {
             //tie game
@@ -335,7 +343,7 @@ public class BlackJackGUI extends Application {
 
             Alert.displayError("Round tie.", playerTied.toString() + " have tied", AlertType.INFORMATION);
         }
-        
+
         placeBets(players);
 
     }
