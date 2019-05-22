@@ -27,8 +27,8 @@ public class InitializePlayers {
 
     private static GridPane grid;
     private static ComboBox transactionTypeDropdown;
-    private static Label comboBoxLabel, player1, player2, player3, player4, player5;
-    private static TextField text1, text2, text3, text4, text5;
+    private static Label comboBoxLabel, player1, player2, player3, player4, player5, initialBalanceLbl;
+    private static TextField text1, text2, text3, text4, text5, initialBalance;
     private static Button confirmPlayers;
     private static Scene setupPlayers;
     private static final ArrayList<BlackJackPlayer> players = new ArrayList<>();
@@ -47,13 +47,15 @@ public class InitializePlayers {
         player3 = new Label("Player3");
         player4 = new Label("Player4");
         player5 = new Label("Player5");
+        initialBalanceLbl = new Label("Initial Balance");
         //player name text field
         text1 = new TextField();
         text2 = new TextField();
         text3 = new TextField();
         text4 = new TextField();
         text5 = new TextField();
-
+        initialBalance = new TextField();
+        initialBalance.setId("initialBalanceText");
         //confirm players button
         confirmPlayers = new Button("Enter");
 
@@ -83,11 +85,13 @@ public class InitializePlayers {
             text3.clear();
             text4.clear();
             text5.clear();
-            grid.getChildren().removeAll(player1, player2, player3, player4, player5, text1, text2, text3, text4, text5);
+            grid.getChildren().removeAll(player1, player2, player3, player4, player5, text1, text2, text3, text4, text5, initialBalanceLbl, initialBalance);
             switch (number) {
                 case 1:
                     grid.add(player1, 0, 1);
                     grid.add(text1, 1, 1);
+                    grid.add(initialBalanceLbl, 0, 2);
+                    grid.add(initialBalance, 1, 2);
                     break; // break is optional
 
                 case 2:
@@ -95,6 +99,8 @@ public class InitializePlayers {
                     grid.add(text1, 1, 1);
                     grid.add(player2, 0, 2);
                     grid.add(text2, 1, 2);
+                    grid.add(initialBalanceLbl, 0, 3);
+                    grid.add(initialBalance, 1, 3);
                     break;
                 case 3:
                     grid.add(player1, 0, 1);
@@ -103,6 +109,8 @@ public class InitializePlayers {
                     grid.add(text2, 1, 2);
                     grid.add(player3, 0, 3);
                     grid.add(text3, 1, 3);
+                    grid.add(initialBalanceLbl, 0, 4);
+                    grid.add(initialBalance, 1, 4);
                     break;
                 case 4:
                     grid.add(player1, 0, 1);
@@ -113,6 +121,8 @@ public class InitializePlayers {
                     grid.add(text3, 1, 3);
                     grid.add(player4, 0, 4);
                     grid.add(text4, 1, 4);
+                    grid.add(initialBalanceLbl, 0, 5);
+                    grid.add(initialBalance, 1, 5);
                     break;
                 case 5:
                     grid.add(player1, 0, 1);
@@ -125,30 +135,54 @@ public class InitializePlayers {
                     grid.add(text4, 1, 4);
                     grid.add(player5, 0, 5);
                     grid.add(text5, 1, 5);
+                    grid.add(initialBalanceLbl, 0, 6);
+                    grid.add(initialBalance, 1, 6);
                     break;
             }
         });
 
         confirmPlayers.setOnAction(e -> {
             boolean noError = true;
-            try{
-            for (Node node : grid.getChildren()) {
-                if (node instanceof TextField) {
-                    // clear
-                    if(((TextField) node).getText().equals("")){
-                        noError = false;
-                        throw new NullPointerException();
-                    }
-                  //  System.out.println(((TextField) node).getText());
-                    players.add(new BlackJackPlayer(((TextField) node).getText(), 100));
+            String errorTitle = "";
+            String errorText = "";
+            int startingBalance = 0;
+            try {
+                if (initialBalance.getText().equals("")) {
+                    noError = false;
+                    errorTitle = "Initial Balance blank";
+                    errorText = "Initial balance cannot be left blank";
+                    throw new NullPointerException();
+                } else if (!initialBalance.getText().equals("")) {
+                    startingBalance = Integer.parseInt(initialBalance.getText());
                 }
-            }
-            }catch(NullPointerException ex){
-                Alert.displayError("Player name blank", "All player names must be entered", AlertType.ERROR);
+
+                for (Node node : grid.getChildren()) {
+                    if (node instanceof TextField && !node.getId().equals("initialBalanceText")) {
+                        // clear
+                          System.out.println("here");
+                        if (((TextField) node).getText().equals("")) {
+                            noError = false;
+                          
+                            errorTitle = "Player name blank";
+                            errorText = "All player names must be entered";
+                            throw new NullPointerException();
+                        }
+
+                        //  System.out.println(((TextField) node).getText());
+                        players.add(new BlackJackPlayer(((TextField) node).getText(), startingBalance));
+                    }
+                }
+            } catch (NullPointerException ex) {
+                noError = false;
+                Alert.displayError(errorTitle, errorText, AlertType.ERROR);
+            } catch (NumberFormatException ex) {
+                noError = false;
+                Alert.displayError("Input misatch", "The input entered can only be a number", AlertType.ERROR);
             }
             //go to play game scene
-            if(noError)
-            BlackJackGUI.placeBets(players);
+            if (noError) {
+                BlackJackGUI.placeBets(players);
+            }
 
         });
         return players;

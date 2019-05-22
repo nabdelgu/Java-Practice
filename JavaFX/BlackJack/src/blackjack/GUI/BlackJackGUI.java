@@ -7,16 +7,11 @@ package blackjack.GUI;
 
 import blackjack.game.BlackJackPlayer;
 import blackjack.game.BlackJackRound;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -105,15 +100,14 @@ public class BlackJackGUI extends Application {
         diceHBox.getChildren().addAll(dice1View, dice2View);
         diceHBox.setAlignment(Pos.CENTER);
         diceHBox.setPadding(new Insets(10, 10, 10, 10));
-        
-        
+
         borderPane.setTop(details);
         borderPane.setLeft(playerAction);
         borderPane.setBottom(placeBets);
         borderPane.setCenter(diceHBox);
-        playGame = new Scene(borderPane, 400, 350);
-
+        playGame = new Scene(borderPane, 650, 350);
         window = primaryStage;
+        window.setResizable(false);
         players = InitializePlayers.initializePlayers(primaryStage, playGame);
 
     }
@@ -130,7 +124,7 @@ public class BlackJackGUI extends Application {
         playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
         currentBalance.setText("Player Holdings: " + Integer.toString(players.get(playerIndex).getCurrentHoldings()));
         currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
-
+        betAmountLbl.setText("Wager Amount: ");
         window.setScene(playGame);
         window.show();
 
@@ -195,6 +189,8 @@ public class BlackJackGUI extends Application {
             if (blackJackRoundPlayer.getRoundScore() >= 21 && playerIndex <= blackJackRound.size()) {
                 playerIndex++;
                 if (playerIndex <= players.size() - 1) {
+                    dice1View.setImage(null);
+                    dice2View.setImage(null);
                     if (blackJackRoundPlayer.getRoundScore() > maxScore) {
                         maxScore = blackJackRoundPlayer.getRoundScore();
                     }
@@ -215,7 +211,8 @@ public class BlackJackGUI extends Application {
         });
 
         standButton.setOnAction(e -> {
-
+            dice1View.setImage(null);
+            dice2View.setImage(null);
             playerIndex++;
             if (blackJackRoundPlayer.getRoundScore() > maxScore) {
                 maxScore = blackJackRoundPlayer.getRoundScore();
@@ -273,10 +270,10 @@ public class BlackJackGUI extends Application {
             StringBuilder playerTied = new StringBuilder();
             for (BlackJackRound blackJackRound2 : blackJackRound) {
                 if (winnerScoreBlackJackPlayers.get(winnerScoreBlackJackPlayers.size() - 1).equals(blackJackRound2)) {
-                    playerTied.append(blackJackRound2.getPlayer());
+                    playerTied.append(blackJackRound2.getPlayer().getPlayer());
                     playerTied.append(",");
                 } else {
-                    playerTied.append(blackJackRound2.getPlayer());
+                    playerTied.append(blackJackRound2.getPlayer().getPlayer());
                 }
             }
 
