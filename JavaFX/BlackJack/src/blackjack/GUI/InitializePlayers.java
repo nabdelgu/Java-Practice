@@ -157,18 +157,16 @@ public class InitializePlayers {
                 }
 
                 for (Node node : grid.getChildren()) {
-                    if (node instanceof TextField && !node.getId().equals("initialBalanceText")) {
+
+                    if (node instanceof TextField && node.getId() == null) {
                         // clear
-                          System.out.println("here");
                         if (((TextField) node).getText().equals("")) {
                             noError = false;
-                          
                             errorTitle = "Player name blank";
                             errorText = "All player names must be entered";
                             throw new NullPointerException();
                         }
 
-                        //  System.out.println(((TextField) node).getText());
                         players.add(new BlackJackPlayer(((TextField) node).getText(), startingBalance));
                     }
                 }
@@ -177,7 +175,7 @@ public class InitializePlayers {
                 Alert.displayError(errorTitle, errorText, AlertType.ERROR);
             } catch (NumberFormatException ex) {
                 noError = false;
-                Alert.displayError("Input misatch", "The input entered can only be a number", AlertType.ERROR);
+                Alert.displayError("Initial balance input misatch", "The input entered into initial balance can only be a number", AlertType.ERROR);
             }
             //go to play game scene
             if (noError) {
