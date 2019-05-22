@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -129,14 +130,24 @@ public class InitializePlayers {
         });
 
         confirmPlayers.setOnAction(e -> {
+            boolean noError = true;
+            try{
             for (Node node : grid.getChildren()) {
                 if (node instanceof TextField) {
                     // clear
+                    if(((TextField) node).getText().equals("")){
+                        noError = false;
+                        throw new NullPointerException();
+                    }
                   //  System.out.println(((TextField) node).getText());
                     players.add(new BlackJackPlayer(((TextField) node).getText(), 100));
                 }
             }
+            }catch(NullPointerException ex){
+                Alert.displayError("Player name blank", "All player names must be entered", AlertType.ERROR);
+            }
             //go to play game scene
+            if(noError)
             BlackJackGUI.placeBets(players);
 
         });
