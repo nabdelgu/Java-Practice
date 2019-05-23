@@ -39,7 +39,7 @@ public class InitializePlayers {
         comboBoxLabel = new javafx.scene.control.Label("Number of players");
 
         //number of players drop down
-        transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(1, 2, 3, 4, 5));
+        transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(2, 3, 4, 5));
 
         //player name labels
         player1 = new Label("Player1");
