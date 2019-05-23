@@ -35,13 +35,13 @@ import javafx.stage.Stage;
  * @author noaha
  */
 public class BlackJackGUI extends Application {
-    
+
     private static ArrayList<BlackJackPlayer> players;
     private static Scene playGame;
     private static Label playerName, roundScore, currentBalance, betAmountLbl, instructionsLbl;
     private static HBox details, placeBets, diceHBox;
     private static VBox playerAction, instructionVBox;
-    
+
     private static final Random random = new Random();
     private static ArrayList<BlackJackPlayer> blackJackPlayers = new ArrayList<>();
     private static HashMap<BlackJackPlayer, Boolean> blackjackPlayersHm = new HashMap<BlackJackPlayer, Boolean>();
@@ -56,10 +56,10 @@ public class BlackJackGUI extends Application {
     private static int roll1, roll2;
     private static int playerIndex = 0;
     private static int maxScore = 0;
-    
+
     @Override
     public void start(Stage primaryStage) throws InvocationTargetException {
-        
+
         playerName = new Label();
         roundScore = new Label("Round Score:");
         //roundScore.setMaxWidth(150);
@@ -69,11 +69,11 @@ public class BlackJackGUI extends Application {
         details = new HBox();
         details.setSpacing(10);
         details.getChildren().addAll(playerName, roundScore, currentBalance, betAmountLbl);
-        
+
         placeBet = new Button("Place Bet");
         betAmount = new TextField();
         betAmount.setPromptText("Enter Amount to bet");
-        
+
         placeBets = new HBox();
         placeBets.setPadding(new Insets(10, 10, 10, 10));
         placeBets.setSpacing(10);
@@ -89,23 +89,23 @@ public class BlackJackGUI extends Application {
         withdrawButton = new Button("Withdraw");
         withdrawButton.setMaxHeight(100);
         withdrawButton.setMaxWidth(100);
-        
+
         playerAction = new VBox(15);
         playerAction.getChildren().addAll(hitButton, standButton, withdrawButton);
         playerAction.setPadding(new Insets(10, 10, 10, 10));
         playerAction.setAlignment(Pos.CENTER);
         borderPane = new BorderPane();
-        
+
         dice2View = new ImageView();
         dice2View.setFitHeight(50);
         dice2View.setFitWidth(50);
-        
+
         dice1View = new ImageView();
         dice1View.setFitHeight(50);
         dice1View.setFitWidth(50);
-        
+
         diceHBox = new HBox(15);
-        
+
         diceHBox.getChildren().addAll(dice1View, dice2View);
         diceHBox.setAlignment(Pos.CENTER);
         //diceHBox.setPadding(new Insets(10, 10, 10, 10));
@@ -113,7 +113,7 @@ public class BlackJackGUI extends Application {
         instructionVBox = new VBox(15);
         instructionVBox.getChildren().addAll(instructionsLbl, diceHBox);
         instructionVBox.setAlignment(Pos.CENTER);
-        
+
         borderPane.setTop(details);
         borderPane.setLeft(playerAction);
         borderPane.setBottom(placeBets);
@@ -122,9 +122,9 @@ public class BlackJackGUI extends Application {
         window = primaryStage;
         window.setResizable(false);
         players = InitializePlayers.initializePlayers(primaryStage, playGame);
-        
+
     }
-    
+
     public static void placeBets(ArrayList<BlackJackPlayer> players) {
         hitButton.setDisable(true);
         standButton.setDisable(true);
@@ -143,38 +143,41 @@ public class BlackJackGUI extends Application {
         instructionsLbl.setText(currentPlayer.getPlayer() + " place your bet!");
         window.setScene(playGame);
         window.show();
-        
+
         placeBet.setOnAction(e -> {
             try {
-                String errorTitle, errorText;
-                errorTitle = "";
-                errorText = "";
-                if (betAmount.getText().equals("")) {
-                    throw new NullPointerException();
-                } else if (Integer.parseInt(betAmount.getText()) > currentPlayer.getCurrentHoldings()) {
-                    throw new InputMismatchException();
-                }
-                if (playerIndex <= players.size()) {
-                    
-                    currentPlayer = players.get(playerIndex);
-                    blackJackRound.add(new BlackJackRound(currentPlayer, Integer.parseInt(betAmount.getText()), 0));
-                    currentPlayer.setCurrentHoldings(currentPlayer.getCurrentHoldings() - Integer.parseInt(betAmount.getText()));
-                    betAmount.clear();
+                if (currentPlayer.isDealer()) {
 
-                    //set next player labels
-                    playerIndex++;
-                    if ((playerIndex >= players.size())) {
-                        placeBet.setDisable(true);
-                        betAmount.setDisable(true);
-                        betAmount.clear();
-                        playRound();
-                    } else {
+                } else {
+                    String errorTitle, errorText;
+                    errorTitle = "";
+                    errorText = "";
+                    if (betAmount.getText().equals("")) {
+                        throw new NullPointerException();
+                    } else if (Integer.parseInt(betAmount.getText()) > currentPlayer.getCurrentHoldings()) {
+                        throw new InputMismatchException();
+                    }
+                    if (playerIndex <= players.size()) {
+
                         currentPlayer = players.get(playerIndex);
-                        playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
-                        currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
+                        blackJackRound.add(new BlackJackRound(currentPlayer, Integer.parseInt(betAmount.getText()), 0));
+                        currentPlayer.setCurrentHoldings(currentPlayer.getCurrentHoldings() - Integer.parseInt(betAmount.getText()));
+                        betAmount.clear();
+
+                        //set next player labels
+                        playerIndex++;
+                        if ((playerIndex >= players.size())) {
+                            placeBet.setDisable(true);
+                            betAmount.setDisable(true);
+                            betAmount.clear();
+                            playRound();
+                        } else {
+                            currentPlayer = players.get(playerIndex);
+                            playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
+                            currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
+                        }
                     }
                 }
-                
             } catch (NullPointerException ex) {
                 Alert.displayError("Bet blank", "The bet field cannot be left blank.", AlertType.ERROR);
             } catch (InputMismatchException ex) {
@@ -182,9 +185,9 @@ public class BlackJackGUI extends Application {
             } catch (NumberFormatException ex) {
                 Alert.displayError("Input mismatch", "The input must be a number.", AlertType.ERROR);
             }
-            
+
         });
-        
+
         withdrawButton.setOnAction(e -> {
             Alert.displayError("Player withdraw", currentPlayer.getPlayer() + " has withdrawn with " + currentPlayer.getCurrentHoldings() + "$", AlertType.INFORMATION);
             players.remove(currentPlayer);
@@ -198,22 +201,22 @@ public class BlackJackGUI extends Application {
                     node.setDisable(true);
                 }
                 Alert.displayError("Game over", "No players left to play against. Game over", AlertType.INFORMATION);
-                
+
             } else {
                 currentPlayer = players.get(playerIndex);
                 playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
                 currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
-                
+
             }
-            
+
         });
-        
+
     }
-    
+
     private static void determineIfGameOver() {
-        
+
     }
-    
+
     private static void playRound() {
         playerIndex = 0;
         maxScore = 0;
@@ -265,10 +268,10 @@ public class BlackJackGUI extends Application {
                     dice2View.setImage(null);
                     determineWinner(maxScore);
                 }
-                
+
             }
         });
-        
+
         standButton.setOnAction(e -> {
             dice1View.setImage(null);
             dice2View.setImage(null);
@@ -276,7 +279,7 @@ public class BlackJackGUI extends Application {
             if (blackJackRoundPlayer.getRoundScore() > maxScore) {
                 maxScore = blackJackRoundPlayer.getRoundScore();
             }
-            
+
             if (playerIndex <= players.size() - 1) {
                 blackJackRoundPlayer = blackJackRound.get(playerIndex);
                 playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
@@ -289,14 +292,14 @@ public class BlackJackGUI extends Application {
                 standButton.setDisable(true);
                 determineWinner(maxScore);
             }
-            
+
         });
     }
-    
+
     private static int rollDice() {
         return (random.nextInt((6 - 1) + 1) + 1);
     }
-    
+
     public static void determineWinner(int maxScore) {
         ArrayList<BlackJackPlayer> winnerScoreBlackJackPlayers = new ArrayList<>();
         BlackJackRound winnerPlayerRound = null;
@@ -327,12 +330,12 @@ public class BlackJackGUI extends Application {
             for (BlackJackRound blackJackRound3 : blackJackRound) {
                 blackJackRound3.getPlayer().addToHoldings(blackJackRound3.getRoundScore());
             }
-            
+
             Alert.displayError("Round tie.", playerTied.toString() + " have tied", AlertType.INFORMATION);
         }
-        
+
         placeBets(players);
-        
+
     }
 
     /**
@@ -342,5 +345,5 @@ public class BlackJackGUI extends Application {
         // System.out.println("Dice Roll 1: " + new File(BlackJackGUI.class.getResource("src/BlackJack/Images/dice-six-faces-1.png").toString()).exists());
         launch(args);
     }
-    
+
 }

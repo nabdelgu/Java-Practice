@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -31,6 +32,7 @@ public class InitializePlayers {
     private static TextField text1, text2, text3, text4, text5, initialBalance;
     private static Button confirmPlayers;
     private static Scene setupPlayers;
+    private static CheckBox playAgainstDealerCb;
     private static final ArrayList<BlackJackPlayer> players = new ArrayList<>();
 
     public static ArrayList<BlackJackPlayer> initializePlayers(Stage primaryStage, Scene playGame) {
@@ -59,12 +61,15 @@ public class InitializePlayers {
         //confirm players button
         confirmPlayers = new Button("Enter");
 
+        playAgainstDealerCb = new CheckBox("Play Against Dealer");
+
         grid = new GridPane();
         grid.setVgap(10);
         grid.setHgap(5);
         grid.setPadding(new Insets(5, 5, 5, 5));
         grid.add(comboBoxLabel, 0, 0);
         grid.add(transactionTypeDropdown, 1, 0);
+        grid.add(playAgainstDealerCb, 2, 0);
         //add text labels
 
         //add button
@@ -77,6 +82,30 @@ public class InitializePlayers {
         primaryStage.setScene(setupPlayers);
         primaryStage.show();
 
+        playAgainstDealerCb.setOnAction(e -> {
+            if (playAgainstDealerCb.isSelected()) {
+                text1.clear();
+                text2.clear();
+                text3.clear();
+                text4.clear();
+                text5.clear();
+                grid.getChildren().removeAll(player1, player2, player3, player4, player5, text1, text2, text3, text4, text5, initialBalanceLbl, initialBalance);
+                grid.add(player1, 0, 1);
+                grid.add(text1, 1, 1);
+                grid.add(initialBalanceLbl, 0, 2);
+                grid.add(initialBalance, 1, 2);
+                transactionTypeDropdown.setDisable(true);
+            } else {
+                transactionTypeDropdown.setDisable(false);
+                text1.clear();
+                text2.clear();
+                text3.clear();
+                text4.clear();
+                text5.clear();
+                grid.getChildren().removeAll(player1, player2, player3, player4, player5, text1, text2, text3, text4, text5, initialBalanceLbl, initialBalance);
+            }
+        });
+
         //update the labels and textfields when the user selects the number of players
         transactionTypeDropdown.setOnAction(e -> {
             int number = Integer.parseInt(transactionTypeDropdown.getValue().toString());
@@ -88,55 +117,55 @@ public class InitializePlayers {
             grid.getChildren().removeAll(player1, player2, player3, player4, player5, text1, text2, text3, text4, text5, initialBalanceLbl, initialBalance);
             switch (number) {
                 case 1:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(initialBalanceLbl, 0, 2);
-                    grid.add(initialBalance, 1, 2);
+                    grid.add(player1, 0, 2);
+                    grid.add(text1, 1, 2);
+                    grid.add(initialBalanceLbl, 0, 3);
+                    grid.add(initialBalance, 1, 3);
                     break; // break is optional
 
                 case 2:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(initialBalanceLbl, 0, 3);
-                    grid.add(initialBalance, 1, 3);
-                    break;
-                case 3:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
+                    grid.add(player1, 0, 2);
+                    grid.add(text1, 1, 2);
+                    grid.add(player2, 0, 3);
+                    grid.add(text2, 1, 3);
                     grid.add(initialBalanceLbl, 0, 4);
                     grid.add(initialBalance, 1, 4);
                     break;
-                case 4:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
-                    grid.add(player4, 0, 4);
-                    grid.add(text4, 1, 4);
+                case 3:
+                    grid.add(player1, 0, 2);
+                    grid.add(text1, 1, 2);
+                    grid.add(player2, 0, 3);
+                    grid.add(text2, 1, 3);
+                    grid.add(player3, 0, 4);
+                    grid.add(text3, 1, 4);
                     grid.add(initialBalanceLbl, 0, 5);
                     grid.add(initialBalance, 1, 5);
                     break;
-                case 5:
-                    grid.add(player1, 0, 1);
-                    grid.add(text1, 1, 1);
-                    grid.add(player2, 0, 2);
-                    grid.add(text2, 1, 2);
-                    grid.add(player3, 0, 3);
-                    grid.add(text3, 1, 3);
-                    grid.add(player4, 0, 4);
-                    grid.add(text4, 1, 4);
-                    grid.add(player5, 0, 5);
-                    grid.add(text5, 1, 5);
+                case 4:
+                    grid.add(player1, 0, 2);
+                    grid.add(text1, 1, 2);
+                    grid.add(player2, 0, 3);
+                    grid.add(text2, 1, 3);
+                    grid.add(player3, 0, 4);
+                    grid.add(text3, 1, 4);
+                    grid.add(player4, 0, 5);
+                    grid.add(text4, 1, 5);
                     grid.add(initialBalanceLbl, 0, 6);
                     grid.add(initialBalance, 1, 6);
+                    break;
+                case 5:
+                    grid.add(player1, 0, 2);
+                    grid.add(text1, 1, 2);
+                    grid.add(player2, 0, 3);
+                    grid.add(text2, 1, 3);
+                    grid.add(player3, 0, 4);
+                    grid.add(text3, 1, 4);
+                    grid.add(player4, 0, 5);
+                    grid.add(text4, 1, 5);
+                    grid.add(player5, 0, 6);
+                    grid.add(text5, 1, 6);
+                    grid.add(initialBalanceLbl, 0, 7);
+                    grid.add(initialBalance, 1, 7);
                     break;
             }
         });
@@ -147,6 +176,7 @@ public class InitializePlayers {
             String errorText = "";
             int startingBalance = 0;
             try {
+
                 if (initialBalance.getText().equals("")) {
                     noError = false;
                     errorTitle = "Initial Balance blank";
@@ -155,21 +185,28 @@ public class InitializePlayers {
                 } else if (!initialBalance.getText().equals("")) {
                     startingBalance = Integer.parseInt(initialBalance.getText());
                 }
+                if (playAgainstDealerCb.isSelected()) {
+                    //play against dealer
+                    players.add(new BlackJackPlayer(text1.getText(), startingBalance, false));
+                    players.add(new BlackJackPlayer("Dealer", startingBalance, true));
+                } else {
+                    for (Node node : grid.getChildren()) {
 
-                for (Node node : grid.getChildren()) {
+                        if (node instanceof TextField && node.getId() == null) {
+                            // clear
+                            if (((TextField) node).getText().equals("")) {
+                                noError = false;
+                                errorTitle = "Player name blank";
+                                errorText = "All player names must be entered";
+                                throw new NullPointerException();
+                            }
 
-                    if (node instanceof TextField && node.getId() == null) {
-                        // clear
-                        if (((TextField) node).getText().equals("")) {
-                            noError = false;
-                            errorTitle = "Player name blank";
-                            errorText = "All player names must be entered";
-                            throw new NullPointerException();
+                            players.add(new BlackJackPlayer(((TextField) node).getText(), startingBalance, false));
                         }
-
-                        players.add(new BlackJackPlayer(((TextField) node).getText(), startingBalance));
                     }
+
                 }
+
             } catch (NullPointerException ex) {
                 noError = false;
                 Alert.displayError(errorTitle, errorText, AlertType.ERROR);
@@ -179,10 +216,16 @@ public class InitializePlayers {
             }
             //go to play game scene
             if (noError) {
+                System.out.println("here");
+                for (BlackJackPlayer player : players) {
+                    System.out.println(player);
+                }
+
                 BlackJackGUI.placeBets(players);
             }
 
-        });
+        }
+        );
         return players;
 
     }

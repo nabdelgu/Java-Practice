@@ -12,10 +12,12 @@ package blackjack.game;
 public class BlackJackPlayer {
     private String player;
     private int currentHoldings;
+    private boolean dealer;
 
-    public BlackJackPlayer(String player, int currentHoldings) {
+    public BlackJackPlayer(String player, int currentHoldings,boolean dealer) {
         this.player = player;
         this.currentHoldings = currentHoldings;
+        this.dealer = dealer;
     }
  
     public String getPlayer() {
@@ -36,6 +38,14 @@ public class BlackJackPlayer {
     
     public void addToHoldings(int amount){
         this.currentHoldings += amount;
+    }
+
+    public boolean isDealer() {
+        return dealer;
+    }
+
+    public void setIsDealer(boolean dealer) {
+        this.dealer = dealer;
     }
 
     @Override
