@@ -7,11 +7,19 @@ package blackjack.GUI;
 
 /**
  *
- * @author noaha
+ * @author Noah Abdelguerfi
+ * @since 5/26/2019
  */
 public class Alert {
 
-    public static void displayError(String title,String message,javafx.scene.control.Alert.AlertType alertType) {
+    /**
+     *
+     * @param title
+     * @param message
+     * @param alertType Generates a alert box with the specified title,message,
+     * and alert type
+     */
+    public static void displayError(String title, String message, javafx.scene.control.Alert.AlertType alertType) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(alertType);
         alert.setTitle(title);
 

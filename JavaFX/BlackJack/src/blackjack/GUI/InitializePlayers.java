@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package blackjack.GUI;
 
 import blackjack.game.BlackJackPlayer;
@@ -22,7 +17,8 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author noaha
+ * @author Noah Abdellguerfi
+ * @since 05/26/2019
  */
 public class InitializePlayers {
 
@@ -63,9 +59,10 @@ public class InitializePlayers {
 
         playAgainstDealerCb = new CheckBox("Play Against Dealer");
 
+        //add items to the grid
         grid = new GridPane();
         grid.setVgap(10);
-        grid.setHgap(5);
+        grid.setHgap(15);
         grid.setPadding(new Insets(5, 5, 5, 5));
         grid.add(comboBoxLabel, 0, 0);
         grid.add(transactionTypeDropdown, 1, 0);
@@ -82,7 +79,9 @@ public class InitializePlayers {
         primaryStage.setScene(setupPlayers);
         primaryStage.show();
 
+        //play against dealer option
         playAgainstDealerCb.setOnAction(e -> {
+            // play against dealer option is selected
             if (playAgainstDealerCb.isSelected()) {
                 text1.clear();
                 text2.clear();
@@ -170,13 +169,14 @@ public class InitializePlayers {
             }
         });
 
+        //confirm players button is pressed
         confirmPlayers.setOnAction(e -> {
             boolean noError = true;
             String errorTitle = "";
             String errorText = "";
             int startingBalance = 0;
             try {
-
+                //validate user input
                 if (initialBalance.getText().equals("")) {
                     noError = false;
                     errorTitle = "Initial Balance blank";
@@ -200,7 +200,7 @@ public class InitializePlayers {
                                 errorText = "All player names must be entered";
                                 throw new NullPointerException();
                             }
-
+                            //add player object if validation passes
                             players.add(new BlackJackPlayer(((TextField) node).getText(), startingBalance, false));
                         }
                     }
