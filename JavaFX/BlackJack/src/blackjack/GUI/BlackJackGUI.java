@@ -39,8 +39,6 @@ public class BlackJackGUI extends Application {
     private static VBox playerAction, instructionVBox;
 
     private static final Random random = new Random();
-    private static final ArrayList<BlackJackPlayer> blackJackPlayers = new ArrayList<>();
-    private static final HashMap<BlackJackPlayer, Boolean> blackjackPlayersHm = new HashMap<BlackJackPlayer, Boolean>();
     private static Stage window;
     private static Button placeBet, hitButton, standButton, withdrawButton;
     private static BorderPane borderPane;
@@ -125,6 +123,7 @@ public class BlackJackGUI extends Application {
      * their bets.
      */
     public static void placeBets(ArrayList<BlackJackPlayer> players) {
+        //remove players that are out of money
         hitButton.setDisable(true);
         standButton.setDisable(true);
         placeBet.setDisable(false);
@@ -208,10 +207,8 @@ public class BlackJackGUI extends Application {
             }
             //one player left so stop the game
             if (players.size() == 1) {
-                for (Node node : borderPane.getChildren()) {
-                    node.setDisable(true);
-                }
-                Alert.displayError("Game over", "No players left to play against. Game over", AlertType.INFORMATION);
+                instructionsLbl.setText("Game Over");
+                gameOver();
 
             } else {
                 //set screen to the next player
@@ -388,6 +385,38 @@ public class BlackJackGUI extends Application {
         return maxScore;
     }
 
+    //remove the players that dont have any more money
+    private static void removePlayersThatAreOutOfMoney() {
+        //iterate through the array list if the players are out of money remove them
+        ArrayList<Integer> indexesToDelete = new ArrayList<Integer>();
+
+        for (int i = 0; i < players.size(); i++) {
+            //if players score is 0 add them to indexesToDelete array list
+            if (players.get(i).getCurrentHoldings() == 0) {
+                Alert.displayError("Player out of money", players.get(i).getPlayer() + " is out of money they are being removed from the game.", AlertType.INFORMATION);
+                indexesToDelete.add(i);
+            }
+        }
+        //iterate through the array list and delete 
+        for (Integer i : indexesToDelete) {
+            players.remove(players.get(i));
+
+        }
+
+        if (players.size() == 1) {
+            instructionsLbl.setText("Game Over");
+            gameOver();
+        }
+    }
+
+    //determines if the game is over
+    private static void gameOver() {
+        for (Node node : borderPane.getChildren()) {
+            node.setDisable(true);
+        }
+        Alert.displayError("Game over", "No players left to play against. Game over", AlertType.INFORMATION);
+    }
+
     /**
      *
      * @param min
@@ -423,14 +452,18 @@ public class BlackJackGUI extends Application {
 
             }
         } else {
-          //game is a tie
+            //game is a tie
             for (BlackJackRound blackJackRound3 : blackJackRound) {
                 blackJackRound3.getPlayer().addToHoldings(blackJackRound3.getRoundWager());
             }
             Alert.displayError("Round tie.", "The round has ended in a tie", AlertType.INFORMATION);
         }
         //call place bets
-        placeBets(players);
+
+        removePlayersThatAreOutOfMoney();
+        if (players.size() > 1) {
+            placeBets(players);
+        }
 
     }
 

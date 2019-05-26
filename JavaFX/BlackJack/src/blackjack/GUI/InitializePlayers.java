@@ -216,11 +216,6 @@ public class InitializePlayers {
             }
             //go to play game scene
             if (noError) {
-                System.out.println("here");
-                for (BlackJackPlayer player : players) {
-                    System.out.println(player);
-                }
-
                 BlackJackGUI.placeBets(players);
             }
 
