@@ -1,8 +1,3 @@
-/*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * To change this license header, choose License Headers in Project Properties.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * To change this template file, choose Tools | Templates
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * and open the template in the editor.
- */
 package blackjack.GUI;
 
 import blackjack.game.BlackJackPlayer;
@@ -32,7 +27,8 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author noaha
+ * @author Noah Abdelguerfi
+ * @since 05/25/2019
  */
 public class BlackJackGUI extends Application {
 
@@ -43,26 +39,24 @@ public class BlackJackGUI extends Application {
     private static VBox playerAction, instructionVBox;
 
     private static final Random random = new Random();
-    private static ArrayList<BlackJackPlayer> blackJackPlayers = new ArrayList<>();
-    private static HashMap<BlackJackPlayer, Boolean> blackjackPlayersHm = new HashMap<BlackJackPlayer, Boolean>();
+    private static final ArrayList<BlackJackPlayer> blackJackPlayers = new ArrayList<>();
+    private static final HashMap<BlackJackPlayer, Boolean> blackjackPlayersHm = new HashMap<BlackJackPlayer, Boolean>();
     private static Stage window;
     private static Button placeBet, hitButton, standButton, withdrawButton;
     private static BorderPane borderPane;
     private static TextField betAmount;
     private static BlackJackPlayer currentPlayer;
     private static BlackJackRound blackJackRoundPlayer;
-    private static ArrayList<BlackJackRound> blackJackRound = new ArrayList<>();
+    private static final ArrayList<BlackJackRound> blackJackRound = new ArrayList<>();
     private static ImageView dice1View, dice2View;
     private static int roll1, roll2;
     private static int playerIndex = 0;
-    //private static int maxScore = 0;
 
     @Override
     public void start(Stage primaryStage) throws InvocationTargetException {
 
         playerName = new Label();
         roundScore = new Label("Round Score:");
-        //roundScore.setMaxWidth(150);
         currentBalance = new Label();
         betAmountLbl = new Label();
         instructionsLbl = new Label();
@@ -108,7 +102,6 @@ public class BlackJackGUI extends Application {
 
         diceHBox.getChildren().addAll(dice1View, dice2View);
         diceHBox.setAlignment(Pos.CENTER);
-        //diceHBox.setPadding(new Insets(10, 10, 10, 10));
 
         instructionVBox = new VBox(15);
         instructionVBox.getChildren().addAll(instructionsLbl, diceHBox);
@@ -125,6 +118,12 @@ public class BlackJackGUI extends Application {
 
     }
 
+    /**
+     *
+     * @param ArrayList<BlackJackPlayer>
+     * @since 05/25/2019 Iterates though all the players and lets them place
+     * their bets.
+     */
     public static void placeBets(ArrayList<BlackJackPlayer> players) {
         hitButton.setDisable(true);
         standButton.setDisable(true);
@@ -149,32 +148,38 @@ public class BlackJackGUI extends Application {
                 String errorTitle, errorText;
                 errorTitle = "";
                 errorText = "";
+                //bet has been left blank throw an exception
                 if (betAmount.getText().equals("")) {
                     throw new NullPointerException();
                 } else if (Integer.parseInt(betAmount.getText()) > currentPlayer.getCurrentHoldings()) {
                     throw new InputMismatchException();
                 }
+
+                //next player exists
                 if (playerIndex <= players.size()) {
 
+                    //set the current players bet adjust their holdings
                     currentPlayer = players.get(playerIndex);
                     blackJackRound.add(new BlackJackRound(currentPlayer, Integer.parseInt(betAmount.getText()), 0));
                     currentPlayer.setCurrentHoldings(currentPlayer.getCurrentHoldings() - Integer.parseInt(betAmount.getText()));
                     betAmount.clear();
 
-                    //set next player labels
+                    //increment the player index
                     playerIndex++;
+                    //all players bet play round
                     if ((playerIndex >= players.size())) {
                         placeBet.setDisable(true);
                         betAmount.setDisable(true);
                         betAmount.clear();
                         playRound();
                     } else {
+                        //players still left to bet set screen to next player
                         currentPlayer = players.get(playerIndex);
                         playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
                         currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
-                           instructionsLbl.setText(currentPlayer.getPlayer() + " place your bet!");
+                        instructionsLbl.setText(currentPlayer.getPlayer() + " place your bet!");
+                        // if next player is dealer play the round
                         if (currentPlayer.isDealer()) {
-                            System.out.println("here");
                             blackJackRound.add(new BlackJackRound(currentPlayer, 0, 0));
                             playRound();
                         }
@@ -193,12 +198,15 @@ public class BlackJackGUI extends Application {
 
         withdrawButton.setOnAction(e -> {
             Alert.displayError("Player withdraw", currentPlayer.getPlayer() + " has withdrawn with " + currentPlayer.getCurrentHoldings() + "$", AlertType.INFORMATION);
+            //removes the player from the players array list
             players.remove(currentPlayer);
+            //remove the player from the black jack round array list
             for (BlackJackRound r : blackJackRound) {
                 if (r.getPlayer().equals(currentPlayer)) {
                     blackJackRound.remove(r);
                 }
             }
+            //one player left so stop the game
             if (players.size() == 1) {
                 for (Node node : borderPane.getChildren()) {
                     node.setDisable(true);
@@ -206,6 +214,7 @@ public class BlackJackGUI extends Application {
                 Alert.displayError("Game over", "No players left to play against. Game over", AlertType.INFORMATION);
 
             } else {
+                //set screen to the next player
                 currentPlayer = players.get(playerIndex);
                 playerName.setText("Player Name: " + players.get(playerIndex).getPlayer());
                 currentBalance.setText("Current Holdings: " + currentPlayer.getCurrentHoldings());
@@ -216,41 +225,61 @@ public class BlackJackGUI extends Application {
 
     }
 
+    /**
+     * @param BlackJackRound This method handles a dealers play
+     */
     private static void handleDealerPlay(BlackJackRound blackJackRoundPlayer) {
+        // set the labels
         instructionsLbl.setText("Dealer Turn");
         playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
-       // currentBalance.setText("Player Holdings: " + Integer.toString(blackJackRoundPlayer.getPlayer().getCurrentHoldings()));
-       // betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager() + "$");
-       // currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings());
-        
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(BlackJackGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         boolean dealerTurn = true;
+
         while (dealerTurn) {
+            //perform dice roll and display the dice images
             roll1 = randomNumber(1, 6);
             roll2 = randomNumber(1, 6);
             dice1View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll1 + ".png"));
             dice2View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll2 + ".png"));
             roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
 
+            //add roll to the players round score
             blackJackRoundPlayer.addToRoundScore(roll1 + roll2);
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(BlackJackGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            System.out.println(blackJackRoundPlayer.getRoundScore());
 
-            if (blackJackRoundPlayer.getRoundScore() >= 16) {
+            //dealer keeps rolling until their score is greater than or equal to 16 
+            //determineWinner is then called and dealerTurn is set to false
+            if (blackJackRoundPlayer.getRoundScore() > 21) {
                 roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
-               // maxScore = blackJackRoundPlayer.getRoundScore();
+                Alert.displayError("Delear Broke", "The Dealer broke with a score of " + blackJackRoundPlayer.getRoundScore() + " turn over", AlertType.INFORMATION);
+                dealerTurn = false;
+                determineWinner();
+            } else if (blackJackRoundPlayer.getRoundScore() == 21) {
+                roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
+                Alert.displayError("Delear scored 21", "The Dealer score is 21 turn is over", AlertType.INFORMATION);
+                dealerTurn = false;
+                determineWinner();
+            } else if (blackJackRoundPlayer.getRoundScore() < 16) {
+                roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
+                Alert.displayError("Delear rolled", "The dealer rolled a " + (roll1 + roll2) + " there total score is " + blackJackRoundPlayer.getRoundScore(), AlertType.INFORMATION);
+            } else if (blackJackRoundPlayer.getRoundScore() >= 16 && blackJackRoundPlayer.getRoundScore() < 21) {
+                roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
+                Alert.displayError("Delear stand", "The dealer stood with a score of " + (roll1 + roll2) + " there total score is " + blackJackRoundPlayer.getRoundScore(), AlertType.INFORMATION);
                 dealerTurn = false;
                 determineWinner();
             }
         }
     }
 
+    /*
+    * Handles a round being played. Handles hit and stand button events
+     */
     private static void playRound() {
+        //set the first player
         playerIndex = 0;
-       // maxScore = 0;
         hitButton.setDisable(false);
         standButton.setDisable(false);
         withdrawButton.setDisable(true);
@@ -262,130 +291,145 @@ public class BlackJackGUI extends Application {
         betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager() + "$");
         currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings());
         instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
+
         hitButton.setOnAction(e -> {
-            if (blackJackRoundPlayer.getPlayer().isDealer()) {
-                roll1 = randomNumber(1, 6);
-                roll2 = randomNumber(1, 6);
-                dice1View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll1 + ".png"));
-                dice2View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll2 + ".png"));
-                blackJackRoundPlayer.addToRoundScore(roll1 + roll2);
-            } else {
-                roll1 = randomNumber(1, 6);
-                roll2 = randomNumber(1, 6);
-                //validate file exists
+            //generate random roll
+            roll1 = randomNumber(1, 6);
+            roll2 = randomNumber(1, 6);
+            //set images accordingly
+            dice1View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll1 + ".png"));
+            dice2View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll2 + ".png"));
 
-                dice1View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll1 + ".png"));
-                dice2View.setImage(new Image("file:src/BlackJack/Images/dice-six-faces-" + roll2 + ".png"));
-                // System.out.println(blackJackRoundPlayer.getRoundScore());
+            //add rolls to players round score
+            blackJackRoundPlayer.addToRoundScore(roll1 + roll2);
+            roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
 
-                blackJackRoundPlayer.addToRoundScore(roll1 + roll2);
+            //player score is 21 or break
+            if (blackJackRoundPlayer.getRoundScore() >= 21 && playerIndex <= blackJackRound.size()) {
                 roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
-                //player score is 21 or break
-                if (blackJackRoundPlayer.getRoundScore() >= 21 && playerIndex <= blackJackRound.size()) {
-                    roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
-                    playerIndex++;
-                    if (playerIndex <= players.size() - 1) {
-                        dice1View.setImage(null);
-                        dice2View.setImage(null);
-                       /* if (blackJackRoundPlayer.getRoundScore() > maxScore) {
-                            maxScore = blackJackRoundPlayer.getRoundScore();
-                        }*/
-                        blackJackRoundPlayer = blackJackRound.get(playerIndex);
-                        instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
-                        playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
-                        betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager() + "$");
-                        currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings() + "$");
-                        roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
-                        instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
-                        if (blackJackRoundPlayer.getPlayer().isDealer()) {
-                            System.out.println("1");
-                            handleDealerPlay(blackJackRoundPlayer);
-                        }
-                    } else {
-                        hitButton.setDisable(true);
-                        standButton.setDisable(true);
-                        dice1View.setImage(null);
-                        dice2View.setImage(null);
-                        determineWinner();
-                    }
-
+                //player either broke our scored over 21 display message
+                if (blackJackRoundPlayer.getRoundScore() == 21) {
+                    Alert.displayError("Score 21", "Your score is 21 your turn is over", AlertType.INFORMATION);
+                } else if (blackJackRoundPlayer.getRoundScore() > 21) {
+                    Alert.displayError("Break", "You rolled " + blackJackRoundPlayer.getRoundScore() + " and broke turn over.", AlertType.INFORMATION);
                 }
-            }
-        });
 
-        standButton.setOnAction(e -> {
+                playerIndex++;
+                //next player exists set screen to next player
+                if (playerIndex <= players.size() - 1) {
+                    dice1View.setImage(null);
+                    dice2View.setImage(null);
+                    blackJackRoundPlayer = blackJackRound.get(playerIndex);
+                    instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
+                    playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
+                    betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager() + "$");
+                    currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings() + "$");
+                    roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
+                    instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
+                    //next player is a dealer call handleDealerPlay method
+                    if (blackJackRoundPlayer.getPlayer().isDealer()) {
+                        handleDealerPlay(blackJackRoundPlayer);
+
+                    }
+                } else {
+                    //no next player call determine winner
+                    hitButton.setDisable(true);
+                    standButton.setDisable(true);
+                    dice1View.setImage(null);
+                    dice2View.setImage(null);
+                    determineWinner();
+                }
+
+            }
+        }
+        );
+
+        standButton.setOnAction(e
+                -> {
+            //user stands
             dice1View.setImage(null);
             dice2View.setImage(null);
+            //see if there is a next player
             playerIndex++;
-           /* if (blackJackRoundPlayer.getRoundScore() > maxScore) {
-                maxScore = blackJackRoundPlayer.getRoundScore();
-            }*/
-
             if (playerIndex <= players.size() - 1) {
+                //set screen to the next player
                 blackJackRoundPlayer = blackJackRound.get(playerIndex);
                 playerName.setText("Player Name: " + blackJackRoundPlayer.getPlayer().getPlayer());
                 betAmountLbl.setText("Wager Amount: " + blackJackRoundPlayer.getRoundWager() + "$");
                 currentBalance.setText("Current Holdings: " + blackJackRoundPlayer.getPlayer().getCurrentHoldings() + "$");
                 roundScore.setText("Round Score: " + blackJackRoundPlayer.getRoundScore());
                 instructionsLbl.setText(blackJackRoundPlayer.getPlayer().getPlayer() + " it is your turn to roll!");
+                //if the next player is a dealer call handleDealerPlay
                 if (blackJackRoundPlayer.getPlayer().isDealer()) {
-                    System.out.println("2");
                     handleDealerPlay(blackJackRoundPlayer);
                 }
             } else {
+                //no next player detemine winner
                 hitButton.setDisable(true);
                 standButton.setDisable(true);
-                //determine winner
                 determineWinner();
             }
 
-        });
+        }
+        );
     }
 
+    /**
+     *
+     * @return int gets the max round score that is not greater than 21
+     */
+    private static int getMaxScore() {
+        int maxScore = -1;
+        for (BlackJackRound blackJackRound : blackJackRound) {
+            if (blackJackRound.getRoundScore() > maxScore && blackJackRound.getRoundScore() <= 21) {
+                maxScore = blackJackRound.getRoundScore();
+            }
+        }
+        return maxScore;
+    }
+
+    /**
+     *
+     * @param min
+     * @param max
+     * @return int generates a random number between min and max
+     */
     private static int randomNumber(int min, int max) {
         return (random.nextInt((max - min) + 1) + 1);
     }
 
-    private static int randomBet() {
-        return (random.nextInt((6 - 1) + 1) + 1);
-    }
-
+    //determines the winning black jack player or if there is a tir
     public static void determineWinner() {
         ArrayList<BlackJackPlayer> winnerScoreBlackJackPlayers = new ArrayList<>();
         BlackJackRound winnerPlayerRound = null;
-        int maxScore = 0;
-        //ArrayList<BlackJackRound> blackJackRound
+        //get the max round score
+        int maxScore = getMaxScore();
+
+        //add all players to the array list if they have the max score
         for (BlackJackRound blackJackRound1 : blackJackRound) {
-            if (blackJackRound1.getRoundScore() >= maxScore && blackJackRound1.getRoundScore() <= 21) {
-                maxScore = blackJackRound1.getRoundScore();
+            if (blackJackRound1.getRoundScore() == maxScore) {
                 winnerScoreBlackJackPlayers.add(blackJackRound1.getPlayer());
                 winnerPlayerRound = blackJackRound1;
             }
         }
+        //if aarray list size is 1 than there is one winner
         if (winnerScoreBlackJackPlayers.size() == 1) {
             //one winner
-            winnerScoreBlackJackPlayers.get(0).addToHoldings(winnerPlayerRound.getRoundWager() * 2);
-            Alert.displayError("Round Winner", winnerScoreBlackJackPlayers.get(0).getPlayer() + " has won this round and has won " + winnerPlayerRound.getRoundWager() + "$.", AlertType.INFORMATION);
-        } else {
-            //tie game
-            StringBuilder playerTied = new StringBuilder();
-            for (BlackJackRound blackJackRound2 : blackJackRound) {
-                if (winnerScoreBlackJackPlayers.get(winnerScoreBlackJackPlayers.size() - 1).equals(blackJackRound2)) {
-                    playerTied.append(blackJackRound2.getPlayer().getPlayer());
-                    playerTied.append(",");
-                } else {
-                    playerTied.append(blackJackRound2.getPlayer().getPlayer());
-                }
+            if (winnerScoreBlackJackPlayers.get(0).isDealer()) {
+                Alert.displayError("Round Winner", "The dealer won.", AlertType.INFORMATION);
+            } else {
+                winnerScoreBlackJackPlayers.get(0).addToHoldings(winnerPlayerRound.getRoundWager() * 2);
+                Alert.displayError("Round Winner", winnerScoreBlackJackPlayers.get(0).getPlayer() + " has won this round and has won " + winnerPlayerRound.getRoundWager() + "$.", AlertType.INFORMATION);
+
             }
-
-            //reset players holdings
-            /*for (BlackJackRound blackJackRound3 : blackJackRound) {
-                blackJackRound3.getPlayer().addToHoldings(blackJackRound3.getRoundScore());
-            }*/
-
-            Alert.displayError("Round tie.", playerTied.toString() + " have tied", AlertType.INFORMATION);
+        } else {
+          //game is a tie
+            for (BlackJackRound blackJackRound3 : blackJackRound) {
+                blackJackRound3.getPlayer().addToHoldings(blackJackRound3.getRoundWager());
+            }
+            Alert.displayError("Round tie.", "The round has ended in a tie", AlertType.INFORMATION);
         }
-
+        //call place bets
         placeBets(players);
 
     }
@@ -394,7 +438,6 @@ public class BlackJackGUI extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // System.out.println("Dice Roll 1: " + new File(BlackJackGUI.class.getResource("src/BlackJack/Images/dice-six-faces-1.png").toString()).exists());
         launch(args);
     }
 
