@@ -4,7 +4,6 @@ import blackjack.game.BlackJackPlayer;
 import blackjack.game.BlackJackRound;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -40,7 +39,7 @@ public class BlackJackGUI extends Application {
 
     private static final Random random = new Random();
     private static Stage window;
-    private static Button placeBet, hitButton, standButton, withdrawButton;
+    private static Button placeBet, hitButton, standButton, withdrawButton, playAgain;
     private static BorderPane borderPane;
     private static TextField betAmount;
     private static BlackJackPlayer currentPlayer;
@@ -81,7 +80,8 @@ public class BlackJackGUI extends Application {
         withdrawButton = new Button("Withdraw");
         withdrawButton.setMaxHeight(100);
         withdrawButton.setMaxWidth(100);
-
+        playAgain = new Button("Play again");
+        //  playAgain.getT
         playerAction = new VBox(15);
         playerAction.getChildren().addAll(hitButton, standButton, withdrawButton);
         playerAction.setPadding(new Insets(10, 10, 10, 10));
@@ -102,7 +102,7 @@ public class BlackJackGUI extends Application {
         diceHBox.setAlignment(Pos.CENTER);
 
         instructionVBox = new VBox(15);
-        instructionVBox.getChildren().addAll(instructionsLbl, diceHBox);
+        instructionVBox.getChildren().addAll(instructionsLbl, diceHBox, playAgain);
         instructionVBox.setAlignment(Pos.CENTER);
 
         borderPane.setTop(details);
@@ -113,6 +113,14 @@ public class BlackJackGUI extends Application {
         window = primaryStage;
         window.setResizable(false);
         players = InitializePlayers.initializePlayers(primaryStage, playGame);
+
+        //play game again
+        playAgain.setOnAction(e -> {
+            //allow users to select players again
+            players.clear();
+            blackJackRound.clear();
+            players = InitializePlayers.initializePlayers(primaryStage, playGame);
+        });
 
     }
 
@@ -129,6 +137,7 @@ public class BlackJackGUI extends Application {
         placeBet.setDisable(false);
         betAmount.setDisable(false);
         withdrawButton.setDisable(false);
+        playAgain.setVisible(false);
         dice1View.setImage(null);
         dice2View.setImage(null);
         blackJackRound.clear();
@@ -208,6 +217,9 @@ public class BlackJackGUI extends Application {
             //one player left so stop the game
             if (players.size() == 1) {
                 instructionsLbl.setText("Game Over");
+                withdrawButton.setDisable(true);
+                placeBet.setDisable(true);
+                betAmount.setDisable(true);
                 gameOver();
 
             } else {
@@ -412,9 +424,15 @@ public class BlackJackGUI extends Application {
     //determines if the game is over
     private static void gameOver() {
         for (Node node : borderPane.getChildren()) {
-            node.setDisable(true);
+            if (node instanceof Button && !((Button) node).getText().equals("Play again")) {
+                node.setDisable(true);
+            }
+
         }
         Alert.displayError("Game over", "No players left to play against. Game over", AlertType.INFORMATION);
+        playAgain.setVisible(true);
+        //  playAgain.setDisable(false);
+
     }
 
     /**
