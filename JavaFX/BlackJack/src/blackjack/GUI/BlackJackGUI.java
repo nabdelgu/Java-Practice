@@ -53,13 +53,21 @@ public class BlackJackGUI extends Application {
     public void start(Stage primaryStage) throws InvocationTargetException {
 
         playerName = new Label();
+        playerName.setId("bold-label");
         roundScore = new Label("Round Score:");
+        roundScore.setId("bold-label");
         currentBalance = new Label();
+        currentBalance.setId("bold-label");
         betAmountLbl = new Label();
+        betAmountLbl.setId("bold-label");
         instructionsLbl = new Label();
+        instructionsLbl.getStyleClass().add("label-instructions");
+        // instructionsLbl.setStyle("-fx-font-size: 15pt; -fx-text-fill: #0000ff");
+        //instructionsLbl.setStyle("-fx-text-fill: #cc00cc");
         details = new HBox();
         details.setSpacing(10);
         details.getChildren().addAll(playerName, roundScore, currentBalance, betAmountLbl);
+        details.getStyleClass().add("label-player-info");
 
         placeBet = new Button("Place Bet");
         betAmount = new TextField();
@@ -109,17 +117,18 @@ public class BlackJackGUI extends Application {
         borderPane.setLeft(playerAction);
         borderPane.setBottom(placeBets);
         borderPane.setCenter(instructionVBox);
-        playGame = new Scene(borderPane, 650, 350);
+        playGame = new Scene(borderPane, 800, 500);
+        playGame.getStylesheets().add(BlackJackGUI.class.getResource("style.css").toExternalForm());
         window = primaryStage;
         window.setResizable(false);
-        players = InitializePlayers.initializePlayers(primaryStage, playGame);
+        players = InitializePlayers.initializePlayers(primaryStage);
 
         //play game again
         playAgain.setOnAction(e -> {
             //allow users to select players again
             players.clear();
             blackJackRound.clear();
-            players = InitializePlayers.initializePlayers(primaryStage, playGame);
+            players = InitializePlayers.initializePlayers(primaryStage);
         });
 
     }

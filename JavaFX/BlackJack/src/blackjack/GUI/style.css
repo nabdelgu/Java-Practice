@@ -1,0 +1,23 @@
+.root{
+    -fx-background-color: #006633;
+    -fx-font-size: 10pt;
+}
+
+.textfield{
+    -fx-background-color: #999999
+}
+.button{
+    -fx-background-color: #f46b42;
+    -fx-background-radius: 6;
+}
+.label-instructions{
+    -fx-font-size: 15pt;
+    -fx-text-fill: #0000ff;
+}
+.label-player-info{
+    -fx-font-size: 14pt;
+     font-weight: bold;
+}
+#bold-label{
+    -fx-font-weight: bold;
+}

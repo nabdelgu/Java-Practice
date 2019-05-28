@@ -31,11 +31,11 @@ public class InitializePlayers {
     private static CheckBox playAgainstDealerCb;
     private static final ArrayList<BlackJackPlayer> players = new ArrayList<>();
 
-    public static ArrayList<BlackJackPlayer> initializePlayers(Stage primaryStage, Scene playGame) {
+    public static ArrayList<BlackJackPlayer> initializePlayers(Stage primaryStage) {
 
         //combo box label
         comboBoxLabel = new javafx.scene.control.Label("Number of players");
-
+        comboBoxLabel.getStyleClass().add("label-player-info");
         //number of players drop down
         transactionTypeDropdown = new ComboBox(FXCollections.observableArrayList(2, 3, 4, 5));
 
@@ -45,13 +45,21 @@ public class InitializePlayers {
         player3 = new Label("Player3");
         player4 = new Label("Player4");
         player5 = new Label("Player5");
+
         initialBalanceLbl = new Label("Initial Balance");
+        player1.getStyleClass().add("label-player-info");
+        player2.getStyleClass().add("label-player-info");
+        player3.getStyleClass().add("label-player-info");
+        player4.getStyleClass().add("label-player-info");
+        player5.getStyleClass().add("label-player-info");
+        initialBalanceLbl.getStyleClass().add("label-player-info");
         //player name text field
         text1 = new TextField();
         text2 = new TextField();
         text3 = new TextField();
         text4 = new TextField();
         text5 = new TextField();
+
         initialBalance = new TextField();
         initialBalance.setId("initialBalanceText");
         //confirm players button
@@ -73,8 +81,8 @@ public class InitializePlayers {
         grid.add(confirmPlayers, 1, 7);
 
         //setup player scenes
-        setupPlayers = new Scene(grid, 400, 350);
-
+        setupPlayers = new Scene(grid, 600, 600);
+        setupPlayers.getStylesheets().add(BlackJackGUI.class.getResource("style.css").toExternalForm());
         primaryStage.setTitle("Enter player names");
         primaryStage.setScene(setupPlayers);
         primaryStage.show();
