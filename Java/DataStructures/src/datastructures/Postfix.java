@@ -5,40 +5,6 @@ package datastructures;
 // Algorithms for two methods: convertToPostfix and evaluatePostfix
 public class Postfix {
 
-    /* OUTPUT
-Testing postfix expressions with
-a = 2.0, b = 3.0, c = 4.0, d = 5.0
-
-Infix: a+b correct
-Postfix: ab+
-Value: 5.0
-
-Infix: a-b+c*d correct
-Postfix: ab-cd*+
-Value: 19.0
-
-Infix: (a+b)*c-d correct
-Postfix: ab+c*d- 
-Value: 15.0
-
-Infix: a+b*(c-d) correct
-Postfix: abcd-*+
-Value: -1.0
-
-Infix: (a+b)/(c-d) correct
-Postfix: ab+cd-/
-Value: -5.0
-
-Infix: a*(b/(c-d)) correct
-Postfix: abcd-/*
-Value: -6.0
-     */
-    public static void main(String[] args) {
-        System.out.println(evaluatePostfix(""));
-        //System.out.println(convertToPostfix("a*(b/(c-d))"));
-
-    }
-
     /**
      * Task: Creates a postfix expression that represents a given infix
      * expression.
@@ -120,24 +86,27 @@ public class Postfix {
 
                 Double x, y;
                 // System.out.println(stack.peek());
-                x = (Double) stack.pop();
+                
                 // System.out.println(stack.peek());
+                x = (Double) stack.pop();
+              
                 y = (Double) stack.pop();
-
+                
+                
                 Double z = null;
 
                 switch (c) {
                     case '+':
-                        z = x + y;
+                        z = y + x;
                         break;
                     case '-':
-                        z = x - y;
+                        z = y - x;
                         break;
                     case '*':
-                        z = x * y;
+                        z = y * x;
                         break;
                     case '/':
-                        z = x / y;
+                        z = y / x;
                         break;
                 }
                 stack.push(z);
